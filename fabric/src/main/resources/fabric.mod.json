@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "modifiers",
+  "version": "${version}",
+  "name": "Remodified",
+  "description": "A Minecraft Mod",
+  "authors": [
+    "TeamPotato"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+  "license": "MIT",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.teampotato.modifiers.fabric.Modifiers"
+    ]
+  },
+  "mixins": [
+    "modifiers-common.mixins.json"
+  ],
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.19.2"
+  }
+}
