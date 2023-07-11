@@ -15,7 +15,6 @@ import net.minecraft.screen.SmithingScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -50,7 +49,6 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         super(handler, playerInventory, title, texture);
     }
 
-
     @Unique
     private void modifiers_toTab1() {
         modifiers_onTab2 = false;
@@ -82,19 +80,19 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         Slot slot = this.getScreenHandler().slots.get(2);
         modifiers_outputSlotX = slot.x;
         modifiers_outputSlotY = slot.y;
-        this.modifiers_tabButton1 = new TabButtonWidget(k-70, l+2, 70, 18, MutableText.of(new TranslatableTextContent("container.modifiers.reforge.tab1")), (button) -> modifiers_toTab1());
-        this.modifiers_tabButton2 = new TabButtonWidget(k-70, l+22, 70, 18, MutableText.of(new TranslatableTextContent("container.modifiers.reforge.tab2")), (button) -> modifiers_toTab2());
+        this.modifiers_tabButton1 = new TabButtonWidget(k-70, l+2, 70, 18, Text.translatable("container.modifiers.reforge.tab1"), (button) -> modifiers_toTab1());
+        this.modifiers_tabButton2 = new TabButtonWidget(k-70, l+22, 70, 18, Text.translatable("container.modifiers.reforge.tab2"), (button) -> modifiers_toTab2());
         this.modifiers_tabButton1.setTextureUV(0, 166, 70, 18, new Identifier("modifiers", "textures/gui/reforger.png"));
         this.modifiers_tabButton2.setTextureUV(0, 166, 70, 18, new Identifier("modifiers", "textures/gui/reforger.png"));
         this.modifiers_reforgeButton = new TabButtonWidget(k+132, l+45, 20, 20, Text.of(""),
                 (button) -> NetworkHandler.sendToServer(new PacketC2SReforge()),
-                (button, matrixStack, i, j) -> this.renderTooltip(matrixStack, MutableText.of(new TranslatableTextContent("container.modifiers.reforge.reforge")), i, j));
+                (button, matrixStack, i, j) -> this.renderTooltip(matrixStack, Text.translatable("container.modifiers.reforge.reforge"), i, j));
         this.modifiers_reforgeButton.setTextureUV(0, 202, 20, 20, new Identifier("modifiers", "textures/gui/reforger.png"));
-        this.addDrawable(this.modifiers_tabButton1);
-        this.addDrawable(this.modifiers_tabButton2);
-        this.addDrawable(this.modifiers_reforgeButton);
+        this.addDrawableChild(this.modifiers_tabButton1);
+        this.addDrawableChild(this.modifiers_tabButton2);
+        this.addDrawableChild(this.modifiers_reforgeButton);
         modifiers_tab1Title = this.title;
-        modifiers_tab2Title = MutableText.of(new TranslatableTextContent("container.modifiers.reforge"));
+        modifiers_tab2Title = Text.translatable("container.modifiers.reforge");
         this.modifiers_toTab1();
     }
 
@@ -116,9 +114,8 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
             ItemStack stack = this.handler.getSlot(0).getStack();
             Modifier modifier = ModifierHandler.getModifier(stack);
             if (modifier != null) {
-                this.textRenderer.draw(matrixStack, MutableText.of(new TranslatableTextContent("misc.modifiers.modifier_prefix")).append(MutableText.of(modifier.getFormattedName())), (float)this.titleX-15, (float)this.titleY+15, 4210752);
+                this.textRenderer.draw(matrixStack, Text.translatable("misc.modifiers.modifier_prefix").append(MutableText.of(modifier.getFormattedName())), (float)this.titleX-15, (float)this.titleY+15, 4210752);
             }
         }
     }
 }
-

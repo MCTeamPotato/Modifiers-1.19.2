@@ -44,12 +44,9 @@ public class ItemModifierBook extends Item {
     @Override
     public Text getName(ItemStack stack) {
         TranslatableTextContent base = (TranslatableTextContent) super.getName(stack);
-        if (!stack.hasNbt() || !stack.getOrCreateNbt().contains(ModifierHandler.bookTagName))
-            return MutableText.of(base);
-        Modifier mod = Modifiers.modifiers.get(
-                new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
-        if (mod == null)
-            return MutableText.of(base);
+        if (!stack.hasNbt() || !stack.getOrCreateNbt().contains(ModifierHandler.bookTagName)) return MutableText.of(base);
+        Modifier mod = Modifiers.modifiers.get(new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
+        if (mod == null) return MutableText.of(base);
         return MutableText.of(new TranslatableTextContent("misc.modifiers.modifier_prefix")).append(MutableText.of(mod.getFormattedName()));
     }
 

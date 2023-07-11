@@ -4,6 +4,7 @@ import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
@@ -53,12 +54,12 @@ public class Modifier {
         }
 
         if (d0 > 0.0D) {
-            return MutableText.of(new TranslatableTextContent("attribute.modifier.plus." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
-                    new TranslatableTextContent(entry.getKey().getTranslationKey()))).formatted(Formatting.BLUE);
+            return Text.translatable("attribute.modifier.plus." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
+                    Text.translatable(entry.getKey().getTranslationKey())).formatted(Formatting.BLUE);
         } else if (d0 < 0.0D) {
             d1 = d1 * -1.0D;
-            return MutableText.of(new TranslatableTextContent("attribute.modifier.take." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
-                    new TranslatableTextContent(entry.getKey().getTranslationKey()))).formatted(Formatting.RED);
+            return Text.translatable("attribute.modifier.take." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
+                    Text.translatable(entry.getKey().getTranslationKey())).formatted(Formatting.RED);
         }
         return null;
     }
@@ -68,9 +69,7 @@ public class Modifier {
         //       also maybe "no modifier" for None, idk
         List<MutableText> lines = new ArrayList<>();
         int size = modifiers.size();
-        if (size < 1) {
-            return lines;
-        }
+        if (size < 1) return lines;
         if (size == 1) {
             MutableText description = getModifierDescription(modifiers.get(0));
             if (description == null) return lines;
@@ -79,13 +78,9 @@ public class Modifier {
             lines.add(MutableText.of(getFormattedName()).append(":").formatted(Formatting.GRAY));
             for (Pair<EntityAttribute, AttributeModifierSupplier> entry : modifiers) {
                 MutableText description = getModifierDescription(entry);
-                if (description != null) {
-                    lines.add(description);
-                }
+                if (description != null) lines.add(description);
             }
-            if (lines.size() == 1) {
-                lines.clear();
-            }
+            if (lines.size() == 1) lines.clear();
         }
         return lines;
     }
