@@ -88,9 +88,11 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
                 (button) -> NetworkHandler.sendToServer(new PacketC2SReforge()),
                 (button, matrixStack, i, j) -> this.renderTooltip(matrixStack, Text.translatable("container.modifiers.reforge.reforge"), i, j));
         this.modifiers_reforgeButton.setTextureUV(0, 202, 20, 20, new Identifier("modifiers", "textures/gui/reforger.png"));
+
         this.addDrawableChild(this.modifiers_tabButton1);
         this.addDrawableChild(this.modifiers_tabButton2);
         this.addDrawableChild(this.modifiers_reforgeButton);
+
         modifiers_tab1Title = this.title;
         modifiers_tab2Title = Text.translatable("container.modifiers.reforge");
         this.modifiers_toTab1();
