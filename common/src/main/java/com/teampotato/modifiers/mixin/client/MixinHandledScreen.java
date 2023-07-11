@@ -4,7 +4,6 @@ import com.teampotato.modifiers.client.SmithingScreenReforge;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SmithingScreen;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -13,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HandledScreen.class)
-public abstract class MixinHandledScreen<T extends ScreenHandler> extends Screen {
+public abstract class MixinHandledScreen extends Screen {
 
     protected MixinHandledScreen(Text title) {
         super(title);

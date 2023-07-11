@@ -12,6 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,13 +24,17 @@ public abstract class MixinForgingScreen extends HandledScreen {
         super(handler, inventory, title);
     }
 
+    @Unique
+    private static final Identifier modifiers$reforger = new Identifier("modifiers", "textures/gui/reforger.png");
+
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
     private void onDrawBackground(MatrixStack matrixStack, float f, int i, int j, CallbackInfo ci) {
         if (((Object) this) instanceof SmithingScreen) {
             if (((SmithingScreenReforge) this).modifiers_onTab2()) {
                 ci.cancel();
                 RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-                this.client.getTextureManager().bindTexture(new Identifier("modifiers", "textures/gui/reforger.png"));
+                RenderSystem.setShaderTexture(0, modifiers$reforger);
+                this.client.getTextureManager().bindTexture(modifiers$reforger);
                 int k = (this.width - this.backgroundWidth) / 2;
                 int l = (this.height - this.backgroundHeight) / 2;
                 this.drawTexture(matrixStack, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
