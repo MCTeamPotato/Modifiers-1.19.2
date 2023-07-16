@@ -1,16 +1,19 @@
-package com.teampotato.modifiers.mixin;
+package com.teampotato.modifiers.forge.mixin;
 
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.reforge.SmithingScreenHandlerReforge;
+import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ForgingScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.screen.SmithingScreenHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 
+import java.util.Objects;
 import java.util.Random;
 
 @Mixin(SmithingScreenHandler.class)
@@ -25,7 +28,8 @@ public abstract class MixinSmithingTableContainer extends ForgingScreenHandler i
         ItemStack material = input.getStack(1);
 
         if (ModifierHandler.canHaveModifiers(stack)) {
-            if (stack.getItem().canRepair(stack, material)) {
+            if (stack.getItem().canRepair(stack, material) || ModifiersModForge.universalReforgeItem.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(material.getItem())).toString())) {
+
                 boolean hadModifier = ModifierHandler.hasModifier(stack);
                 Modifier modifier = ModifierHandler.rollModifier(stack, new Random());
                 if (modifier != null) {
@@ -40,4 +44,3 @@ public abstract class MixinSmithingTableContainer extends ForgingScreenHandler i
         }
     }
 }
-

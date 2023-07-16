@@ -1,4 +1,4 @@
-package com.teampotato.modifiers.mixin.client;
+package com.teampotato.modifiers.forge.mixin.client;
 
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;

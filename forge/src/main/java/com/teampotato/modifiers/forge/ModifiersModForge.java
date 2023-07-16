@@ -8,9 +8,13 @@ import com.teampotato.modifiers.forge.network.NetworkHandlerForge;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -20,9 +24,12 @@ import net.minecraftforge.registries.RegistryObject;
 @Mod(ModifiersMod.MODID)
 public class ModifiersModForge extends ModifiersMod {
     public ModifiersModForge() {
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         NetworkHandler.register();
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        eventBus.addListener(this::setup);
         MinecraftForge.EVENT_BUS.register(this);
+        ITEM_DEFERRED_REGISTER.register(eventBus);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, forgeConfigSpec);
     }
 
     static {
@@ -31,7 +38,7 @@ public class ModifiersModForge extends ModifiersMod {
         GROUP_BOOKS = new ItemGroup(-1, ModifiersMod.MODID+"_books") {
             @Override
             public ItemStack createIcon() {
-                return new ItemStack(modifier_book);
+                return MODIFIER_BOOK.get().getDefaultStack();
             }
         };
     }
@@ -41,10 +48,9 @@ public class ModifiersModForge extends ModifiersMod {
             try {
                 curioProxy = (ICurioProxy) Class.forName("com.teampotato.modifiers.forge.curios.CurioCompat").newInstance();
                 MinecraftForge.EVENT_BUS.register(curioProxy);
-            } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | ClassCastException e) {
+            } catch (Throwable e) {
+                System.out.println("Remodified failed to load Curios compatibility.");
                 e.printStackTrace();
-                // FIXME probably don't want this in non-debug releases
-                throw new RuntimeException("Failed to load Curios compatibility. Go tell CursedFlames that her mod is broken.");
             }
         }
         if (curioProxy == null) {
@@ -57,5 +63,16 @@ public class ModifiersModForge extends ModifiersMod {
 
     static {
         MODIFIER_BOOK = ITEM_DEFERRED_REGISTER.register("modifier_book", ItemModifierBook::new);
+    }
+
+    public static ForgeConfigSpec forgeConfigSpec;
+    public static ForgeConfigSpec.ConfigValue<String> universalReforgeItem;
+
+    static {
+        ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+        builder.push("Remodified");
+        universalReforgeItem = builder.define("Universal Reforge Item", "minecraft:diamond");
+        builder.pop();
+        forgeConfigSpec = builder.build();
     }
 }

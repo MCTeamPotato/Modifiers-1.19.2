@@ -1,7 +1,8 @@
-package com.teampotato.modifiers.mixin.client;
+package com.teampotato.modifiers.forge.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.teampotato.modifiers.client.SmithingScreenReforge;
+import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SmithingScreen;
@@ -11,11 +12,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.util.Objects;
 
 @Mixin(ForgingScreen.class)
 public abstract class MixinForgingScreen extends HandledScreen {
@@ -40,12 +44,14 @@ public abstract class MixinForgingScreen extends HandledScreen {
                 this.drawTexture(matrixStack, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
                 ItemStack stack1 = this.handler.getSlot(0).getStack();
                 ItemStack stack2 = this.handler.getSlot(1).getStack();
+                boolean isUniversal = ModifiersModForge.universalReforgeItem.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
 
                 // TODO add a util function somewhere for `canReforge(stack1, stack2)`
                 boolean cantReforge = !stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2);
+                if (isUniversal && cantReforge) cantReforge = false;
                 // canReforge is also true for empty slot 1. Probably how it should behave.
                 ((SmithingScreenReforge) this).modifiers_setCanReforge(!cantReforge);
-                if (!stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2)) {
+                if (!stack1.isEmpty() && !(stack1.getItem().canRepair(stack1, stack2) || isUniversal)) {
                     this.drawTexture(matrixStack, k + 99 - 53, l + 45, this.backgroundWidth, 0, 28, 21);
                 }
             }
