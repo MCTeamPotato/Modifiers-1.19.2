@@ -3,7 +3,6 @@ package com.teampotato.modifiers.forge.mixin.client;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.teampotato.modifiers.client.SmithingScreenReforge;
 import com.teampotato.modifiers.config.ReforgeConfig;
-import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.screen.ingame.SmithingScreen;

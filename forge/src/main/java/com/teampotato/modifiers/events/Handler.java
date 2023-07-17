@@ -1,18 +1,17 @@
 package com.teampotato.modifiers.events;
 
-import com.teampotato.modifiers.common.curios.ICurioProxy;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.modifier.Modifiers;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Random;
 
@@ -24,7 +23,8 @@ public class Handler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onAvilUpdate(AnvilUpdateEvent event) {
         ItemStack right = event.getRight();
-        if (ModifierHandler.canHaveModifiers(event.getLeft()) && right.hasNbt() && right.getItem().getDefaultStack() == MODIFIER_BOOK.get().getDefaultStack()) {
+        if (ModifierHandler.canHaveModifiers(event.getLeft()) && right.hasNbt() &&
+                ForgeRegistries.ITEMS.getKey(right.getItem()) == ForgeRegistries.ITEMS.getKey(MODIFIER_BOOK.get())) {
             Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
             if (modifier != null) {
                 ItemStack output = event.getLeft().copy();
@@ -32,6 +32,7 @@ public class Handler {
                 event.setMaterialCost(1);
                 event.setCost(1);
                 event.setOutput(output);
+                event.setCanceled(false);
             }
         }
     }

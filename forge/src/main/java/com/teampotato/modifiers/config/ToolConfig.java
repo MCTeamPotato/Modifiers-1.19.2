@@ -6,17 +6,17 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.util.List;
 
 public class ToolConfig {
-    public static final ForgeConfigSpec CONFIG;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NAMES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WEIGHTS;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
+    public static ForgeConfigSpec CONFIG;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> NAMES;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> WEIGHTS;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTES;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
 
     static {
         ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
         BUILDER.push("Modifiers for tools");
-        BUILDER.comment("This configuration file is based on index. it means, 'legendary' -> '30' ->'generic.attack_damage;generic.attack_speed' -> '0.15;0.1' -> '2;2' is the first index, and in it, 'generic.attack_damage' -> '0.15' -> '2', 'generic.attack_speed' -> '0.1' -> ‘2’");
+        BUILDER.comment("This configuration file is based on index. it means, 'legendary' -> '30' ->'generic.attack_damage;generic.attack_speed' -> '0.15;0.1' -> '2;2' is the first index, and in it, 'generic.attack_damage' -> '0.15' -> '2', 'generic.attack_speed' -> '0.1' -> '2'");
         NAMES = BUILDER.comment("The name of the modifier").defineList("NAMES", Lists.newArrayList("legendary", "deadly", "vicious", "sharp", "broken", "damaged", "agile", "swift", "sluggish", "slow", "light", "heavy"), o -> true);
         WEIGHTS = BUILDER.comment("The weight of the modifier in the modifiers pool").defineList("WEIGHTS", Lists.newArrayList("30", "100", "100", "100", "70", "100", "100", "100", "100", "100", "100", "100"), o -> true);
         ATTRIBUTES = BUILDER.comment("The attribute of the modifier has. One modifier can have multiple attributes. Use ';' to split different attributes").defineList("ATTRIBUTES", Lists.newArrayList("generic.attack_damage;generic.attack_speed", "generic.attack_damage", "generic.attack_damage", "generic.attack_damage", "generic.attack_damage", "generic.attack_damage", "generic.attack_speed;generic.movement_speed", "generic.attack_speed", "generic.attack_speed;generic.movement_speed", "generic.attack_speed", "generic.attack_damage;generic.attack_speed", "generic.attack_damage;generic.attack_speed;generic.movement_speed"), o -> true);

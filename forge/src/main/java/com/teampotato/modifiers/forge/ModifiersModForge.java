@@ -12,7 +12,6 @@ import com.teampotato.modifiers.forge.network.NetworkHandlerForge;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -28,9 +27,8 @@ import net.minecraftforge.registries.RegistryObject;
 @Mod(ModifiersMod.MODID)
 public class ModifiersModForge extends ModifiersMod {
     public ModifiersModForge() {
-        Modifiers.init();
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModLoadingContext modLoadingContext = ModLoadingContext.get();
+        final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final ModLoadingContext modLoadingContext = ModLoadingContext.get();
         NetworkHandler.register();
         ITEM_DEFERRED_REGISTER.register(eventBus);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
@@ -63,6 +61,7 @@ public class ModifiersModForge extends ModifiersMod {
         if (CURIO_PROXY == null) {
             CURIO_PROXY = new ICurioProxy() {};
         }
+        Modifiers.init();
     }
 
     public static final DeferredRegister<Item> ITEM_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);

@@ -6,12 +6,12 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import java.util.List;
 
 public class CurioNArmorConfig {
-    public static final ForgeConfigSpec CONFIG;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NAMES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WEIGHTS;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTES;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
-    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
+    public static ForgeConfigSpec CONFIG;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> NAMES;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> WEIGHTS;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTES;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
 
     static {
         ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
