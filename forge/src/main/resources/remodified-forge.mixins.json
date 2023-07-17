@@ -17,9 +17,7 @@
     "client.MixinSmithingScreen"
   ],
   "mixins": [
-    "MixinAnvilContainer",
     "MixinItem",
-    "MixinLivingEntity",
     "MixinSmithingTableContainer"
   ]
 }

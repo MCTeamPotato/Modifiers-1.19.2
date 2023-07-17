@@ -52,7 +52,7 @@ public class ModifierHandler {
         NbtCompound tag = stack.getOrCreateNbt();
         if (tag == null) return null;
         if (!tag.contains(tagName)) return null;
-        return Modifiers.modifiers.get(new Identifier(tag.getString(tagName)));
+        return Modifiers.MODIFIERS.get(new Identifier(tag.getString(tagName)));
     }
 
     public static UUID getCurioUuid(String identifier, int slot, int attributeIndex) {

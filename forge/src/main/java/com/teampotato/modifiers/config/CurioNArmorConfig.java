@@ -1,0 +1,28 @@
+package com.teampotato.modifiers.config;
+
+import com.google.common.collect.Lists;
+import net.minecraftforge.common.ForgeConfigSpec;
+
+import java.util.List;
+
+public class CurioNArmorConfig {
+    public static final ForgeConfigSpec CONFIG;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> NAMES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> WEIGHTS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> ATTRIBUTES;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
+    public static final ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
+
+    static {
+        ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+        BUILDER.push("Modifiers for armors and curios");
+        BUILDER.comment("This configuration file is based on index. it means, 'half_hearted' -> '300' -> 'generic.max_health' -> '1.0' -> '0' is the first index.");
+        NAMES = BUILDER.comment("The name of the modifier").defineList("NAMES", Lists.newArrayList("half_hearted", "hearty", "hard", "guarding", "armored", "warding", "jagged", "spiked", "angry", "menacing", "brisk", "fleeting", "hasty", "quick", "wild", "rash", "intrepid", "violent"), o -> true);
+        WEIGHTS = BUILDER.comment("The weight of the modifier in the modifiers pool").defineList("WEIGHTS", Lists.newArrayList("300", "100", "300", "200", "100", "200", "200", "200", "100", "100", "200", "200", "100", "100", "200", "200", "100", "100"), o -> true);
+        ATTRIBUTES = BUILDER.comment("The weight of the modifier in the modifiers pool").defineList("ATTRIBUTES", Lists.newArrayList("generic.max_health", "generic.max_health", "generic.armor", "generic.armor", "generic.armor", "generic.armor_toughness", "generic.attack_damage", "generic.attack_damage", "generic.attack_damage", "generic.attack_damage", "generic.movement_speed", "generic.movement_speed", "generic.movement_speed", "generic.movement_speed", "generic.attack_speed", "generic.attack_speed", "generic.attack_speed", "generic.attack_speed"), o -> true);
+        AMOUNTS = BUILDER.comment("The amount used to calculate the attribute effect. Also can be multiple. Use ';' to split").defineList("AMOUNTS", Lists.newArrayList("1.0", "2.0", "1.0", "1.5", "2.0", "1.0", "0.01", "0.02", "0.03", "0.04", "0.01", "0.02","0.03", "0.04", "0.01", "0.02", "0.03", "0.04"), o -> true);
+        OPERATIONS_IDS = BUILDER.comment("The operation ID of the attribute calculation. Can be three values: 0,1,2. 0 is ADDITION. 1 is MULTIPLY_BASE. 2 is MULTIPLY_TOTAL. you can refer to the calculation of the attributes already in the game").defineList("OPERATIONS_IDS", Lists.newArrayList("0", "0", "0", "0", "0", "0", "2", "2", "2", "2", "2", "2", "2","2", "2", "2", "2", "2"), o -> true);
+        BUILDER.pop();
+        CONFIG = BUILDER.build();
+    }
+}

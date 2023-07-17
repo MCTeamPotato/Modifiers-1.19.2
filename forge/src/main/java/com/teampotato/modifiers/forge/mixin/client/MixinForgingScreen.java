@@ -2,6 +2,7 @@ package com.teampotato.modifiers.forge.mixin.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.teampotato.modifiers.client.SmithingScreenReforge;
+import com.teampotato.modifiers.config.ReforgeConfig;
 import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.client.gui.screen.ingame.ForgingScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -44,7 +45,7 @@ public abstract class MixinForgingScreen extends HandledScreen {
                 this.drawTexture(matrixStack, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
                 ItemStack stack1 = this.handler.getSlot(0).getStack();
                 ItemStack stack2 = this.handler.getSlot(1).getStack();
-                boolean isUniversal = ModifiersModForge.universalReforgeItem.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
+                boolean isUniversal = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
 
                 // TODO add a util function somewhere for `canReforge(stack1, stack2)`
                 boolean cantReforge = !stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2);

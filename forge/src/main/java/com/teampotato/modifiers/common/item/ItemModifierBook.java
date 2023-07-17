@@ -45,7 +45,7 @@ public class ItemModifierBook extends Item {
     public Text getName(ItemStack stack) {
         Text base = super.getName(stack);
         if (!stack.hasNbt() || !stack.getOrCreateNbt().contains(ModifierHandler.bookTagName)) return base;
-        Modifier mod = Modifiers.modifiers.get(new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
+        Modifier mod = Modifiers.MODIFIERS.get(new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
         if (mod == null) return base;
         return MutableText.of(new TranslatableTextContent("misc.modifiers.modifier_prefix")).append(MutableText.of(mod.getFormattedName()));
     }
@@ -54,7 +54,7 @@ public class ItemModifierBook extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World worldIn,
                               List<Text> tooltip, TooltipContext flagIn) {
         if (stack.hasNbt() && stack.getOrCreateNbt().contains(ModifierHandler.bookTagName)) {
-            Modifier mod = Modifiers.modifiers.get(
+            Modifier mod = Modifiers.MODIFIERS.get(
                     new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
             if (mod != null) {
                 tooltip.addAll(mod.getInfoLines());

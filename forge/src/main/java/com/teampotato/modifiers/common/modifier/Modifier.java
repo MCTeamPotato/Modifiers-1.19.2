@@ -8,11 +8,13 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -110,6 +112,14 @@ public class Modifier {
 
         public ModifierBuilder addModifier(EntityAttribute attribute, AttributeModifierSupplier modifier) {
             modifiers.add(new ImmutablePair<>(attribute, modifier));
+            return this;
+        }
+
+        public ModifierBuilder addModifiers(String[] attribute, AttributeModifierSupplier[] modifier) {
+            for (String entityAttribute : attribute) {
+                int index = Arrays.asList(attribute).indexOf(entityAttribute);
+                modifiers.add(new ImmutablePair<>(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute)), modifier[index]));
+            }
             return this;
         }
 
