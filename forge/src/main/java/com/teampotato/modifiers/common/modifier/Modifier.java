@@ -1,15 +1,19 @@
 package com.teampotato.modifiers.common.modifier;
 
+import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -121,8 +125,12 @@ public class Modifier {
                 int index = Arrays.asList(attribute).indexOf(entityAttribute);
                 EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
                 if (registryAttribute == null) {
-                    System.out.println("Invalid key: " + entityAttribute);
-                    MinecraftClient.getInstance().stop();
+                    ModifiersModForge.LOGGER.fatal("Invalid key: " + entityAttribute);
+                    if (FMLLoader.getDist().isDedicatedServer()){
+                        ServerLifecycleHooks.getCurrentServer().shutdown();
+                    } else if (FMLLoader.getDist().isClient()) {
+                        MinecraftClient.getInstance().stop();
+                    }
                 }
                 modifiers.add(new ImmutablePair<>(registryAttribute, modifier[index]));
             }

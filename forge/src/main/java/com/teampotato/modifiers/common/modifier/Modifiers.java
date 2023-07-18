@@ -10,7 +10,9 @@ import net.minecraft.item.ArmorItem;
 import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.SwordItem;
 import net.minecraft.util.Identifier;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,8 +91,12 @@ public class Modifiers {
             } else {
                 EntityAttribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute));
                 if (entityAttribute == null) {
-                    System.out.println("Invalid value: " + attribute);
-                    MinecraftClient.getInstance().stop();
+                    ModifiersModForge.LOGGER.fatal("Invalid value: " + attribute);
+                    if (FMLLoader.getDist().isDedicatedServer()){
+                        ServerLifecycleHooks.getCurrentServer().shutdown();
+                    } else if (FMLLoader.getDist().isClient()) {
+                        MinecraftClient.getInstance().stop();
+                    }
                 }
                 addTool(tool(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }

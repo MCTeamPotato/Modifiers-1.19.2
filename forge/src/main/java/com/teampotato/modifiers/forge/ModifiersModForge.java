@@ -23,6 +23,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(ModifiersMod.MODID)
 public class ModifiersModForge extends ModifiersMod {
@@ -66,6 +68,7 @@ public class ModifiersModForge extends ModifiersMod {
 
     public static final DeferredRegister<Item> ITEM_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
     public static final RegistryObject<Item> MODIFIER_BOOK;
+    public static final Logger LOGGER = LogManager.getLogger();
 
     static {
         MODIFIER_BOOK = ITEM_DEFERRED_REGISTER.register("modifier_book", ItemModifierBook::new);
