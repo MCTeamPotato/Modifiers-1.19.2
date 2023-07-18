@@ -3,6 +3,8 @@ package com.teampotato.modifiers.common.modifier;
 import com.teampotato.modifiers.config.CurioNArmorConfig;
 import com.teampotato.modifiers.config.ToolConfig;
 import com.teampotato.modifiers.forge.ModifiersModForge;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.MiningToolItem;
@@ -85,7 +87,12 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addTool(tool(name).addModifiers(attributes, mods(amounts, operations_ids)).setWeight(Integer.parseInt(weight)).build());
             } else {
-                addTool(tool(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute)), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                EntityAttribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute));
+                if (entityAttribute == null) {
+                    System.out.println("Invalid value: " + attribute);
+                    MinecraftClient.getInstance().stop();
+                }
+                addTool(tool(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -108,7 +115,7 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addCurio(curio(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addCurio(curio(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute)), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addCurio(curio(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }
         }
     }

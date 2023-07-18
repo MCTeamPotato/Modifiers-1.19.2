@@ -1,5 +1,6 @@
 package com.teampotato.modifiers.common.modifier;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -118,7 +119,12 @@ public class Modifier {
         public ModifierBuilder addModifiers(String[] attribute, AttributeModifierSupplier[] modifier) {
             for (String entityAttribute : attribute) {
                 int index = Arrays.asList(attribute).indexOf(entityAttribute);
-                modifiers.add(new ImmutablePair<>(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute)), modifier[index]));
+                EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
+                if (registryAttribute == null) {
+                    System.out.println("Invalid key: " + entityAttribute);
+                    MinecraftClient.getInstance().stop();
+                }
+                modifiers.add(new ImmutablePair<>(registryAttribute, modifier[index]));
             }
             return this;
         }
