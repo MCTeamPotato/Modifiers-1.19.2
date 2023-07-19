@@ -29,7 +29,8 @@ public class ItemModifierBook extends Item {
     @Override
     public boolean hasGlint(ItemStack stack) {
         if (!stack.hasNbt()) return false;
-        NbtCompound tag = stack.getOrCreateNbt();
+        NbtCompound tag = stack.getNbt();
+        if (tag == null) return false;
         return tag.contains(ModifierHandler.bookTagName) && !tag.getString(ModifierHandler.bookTagName).equals("modifiers:none");
     }
 
@@ -44,8 +45,8 @@ public class ItemModifierBook extends Item {
     @Override
     public Text getName(ItemStack stack) {
         Text base = super.getName(stack);
-        if (!stack.hasNbt() || !stack.getOrCreateNbt().contains(ModifierHandler.bookTagName)) return base;
-        Modifier mod = Modifiers.MODIFIERS.get(new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
+        if (!stack.hasNbt() || (stack.getNbt() != null &&!stack.getNbt().contains(ModifierHandler.bookTagName))) return base;
+        Modifier mod = Modifiers.MODIFIERS.get(new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
         if (mod == null) return base;
         return MutableText.of(new TranslatableTextContent("misc.modifiers.modifier_prefix")).append(MutableText.of(mod.getFormattedName()));
     }
@@ -53,9 +54,9 @@ public class ItemModifierBook extends Item {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World worldIn,
                               List<Text> tooltip, TooltipContext flagIn) {
-        if (stack.hasNbt() && stack.getOrCreateNbt().contains(ModifierHandler.bookTagName)) {
+        if (stack.getNbt() != null && stack.getNbt().contains(ModifierHandler.bookTagName)) {
             Modifier mod = Modifiers.MODIFIERS.get(
-                    new Identifier(stack.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
+                    new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
             if (mod != null) {
                 tooltip.addAll(mod.getInfoLines());
                 tooltip.add(MutableText.of(new TranslatableTextContent(this.getTranslationKey()+".tooltip.0")));

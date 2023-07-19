@@ -19,13 +19,12 @@ import static com.teampotato.modifiers.forge.ModifiersModForge.MODIFIER_BOOK;
 
 @Mod.EventBusSubscriber
 public class Handler {
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onAvilUpdate(AnvilUpdateEvent event) {
         ItemStack right = event.getRight();
-        if (ModifierHandler.canHaveModifiers(event.getLeft()) && right.hasNbt() &&
+        if (ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null &&
                 ForgeRegistries.ITEMS.getKey(right.getItem()) == ForgeRegistries.ITEMS.getKey(MODIFIER_BOOK.get())) {
-            Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getOrCreateNbt().getString(ModifierHandler.bookTagName)));
+            Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getNbt().getString(ModifierHandler.bookTagName)));
             if (modifier != null) {
                 ItemStack output = event.getLeft().copy();
                 ModifierHandler.setModifier(output, modifier);
