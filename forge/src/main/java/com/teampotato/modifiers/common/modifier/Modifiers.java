@@ -6,9 +6,7 @@ import com.teampotato.modifiers.forge.ModifiersModForge;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.SwordItem;
+import net.minecraft.item.*;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,8 +30,9 @@ public class Modifiers {
     });
 
     public static ModifierPool tool_pool = new ModifierPool(stack -> {
-        if (stack.getItem() instanceof SwordItem) return true;
-        return stack.getItem() instanceof MiningToolItem;
+        Item item = stack.getItem();
+        if (item instanceof SwordItem) return true;
+        return item instanceof MiningToolItem || item instanceof RangedWeaponItem || item instanceof ShieldItem;
     });
 
     private static Modifier.ModifierBuilder curio(String name) {
