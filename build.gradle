@@ -1,42 +1,69 @@
 plugins {
-    id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.1-SNAPSHOT" apply false
+    id "dev.architectury.loom" version "1.1-SNAPSHOT"
+    id "maven-publish"
 }
 
-architectury {
-    minecraft = rootProject.minecraft_version
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+loom {
+    accessWidenerPath = file("src/main/resources/modifiers.accesswidener")
+
+    forge {
+        convertAccessWideners = true
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
+
+        mixinConfigs = [
+            "modifiers.mixins.json"
+        ]
+    }
+
+    mixin.defaultRefmapName.set("modifiers.refmap.json")
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
+repositories {
+    maven { url = "https://maven.theillusivec4.top/" }
+}
 
-    loom {
-        silentMojangMappingsLicense()
-    }
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
+    forge "net.minecraftforge:forge:${project.forge_version}"
+    modImplementation "top.theillusivec4.curios:curios-forge:${project.curios_forge_version}"
+}
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
+processResources {
+    inputs.property "version", project.version
+    filesMatching("META-INF/mods.toml") {
+        expand "version": project.version
     }
 }
 
-allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
-
-    archivesBaseName = rootProject.archives_base_name
-    version = rootProject.mod_version
-    group = rootProject.maven_group
-
-    repositories {
-        maven {
-                url "https://cursemaven.com"
-        }
-    }
-
-    tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).tap {
+    configureEach {
         options.encoding = "UTF-8"
         options.release.set(17)
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : version,
+                "Implementation-Vendor"   : project.mod_author,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
     }
 }
