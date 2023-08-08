@@ -74,6 +74,7 @@ public class ModifiersMod {
         }
         Modifiers.init();
     }
+
     static {
         MODIFIER_BOOK = ITEM_DEFERRED_REGISTER.register("modifier_book", ItemModifierBook::new);
     }

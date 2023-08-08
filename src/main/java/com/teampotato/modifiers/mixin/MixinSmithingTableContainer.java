@@ -24,6 +24,7 @@ public abstract class MixinSmithingTableContainer extends ForgingScreenHandler i
 
     @Override
     public void modifiers$tryReforge() {
+        if (ReforgeConfig.DISABLE_REPAIR_REFORGED.get()) return;
         ItemStack stack = input.getStack(0);
         ItemStack material = input.getStack(1);
 
