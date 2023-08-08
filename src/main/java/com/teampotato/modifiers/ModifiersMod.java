@@ -3,6 +3,7 @@ package com.teampotato.modifiers;
 import com.teampotato.modifiers.common.config.*;
 import com.teampotato.modifiers.common.curios.ICurioProxy;
 import com.teampotato.modifiers.common.item.ItemModifierBook;
+import com.teampotato.modifiers.common.modifier.Modifiers;
 import com.teampotato.modifiers.common.network.NetworkHandler;
 import com.teampotato.modifiers.common.network.NetworkHandlerForge;
 import net.minecraft.item.Item;
@@ -24,6 +25,11 @@ import org.apache.logging.log4j.Logger;
 
 @Mod(ModifiersMod.MOD_ID)
 public class ModifiersMod {
+    public static final String MOD_ID = "modifiers";
+    public static final DeferredRegister<Item> ITEM_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
+    public static final RegistryObject<Item> MODIFIER_BOOK;
+    public static final Logger LOGGER = LogManager.getLogger();
+
     public static ICurioProxy CURIO_PROXY;
 
     public static ItemGroup GROUP_BOOKS;
@@ -66,14 +72,8 @@ public class ModifiersMod {
         if (CURIO_PROXY == null) {
             CURIO_PROXY = new ICurioProxy() {};
         }
-        com.teampotato.modifiers.common.modifier.Modifiers.init();
+        Modifiers.init();
     }
-
-    public static final String MOD_ID = "modifiers";
-    public static final DeferredRegister<Item> ITEM_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
-    public static final RegistryObject<Item> MODIFIER_BOOK;
-    public static final Logger LOGGER = LogManager.getLogger();
-
     static {
         MODIFIER_BOOK = ITEM_DEFERRED_REGISTER.register("modifier_book", ItemModifierBook::new);
     }
