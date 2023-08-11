@@ -1,5 +1,6 @@
 package com.teampotato.modifiers.common.events;
 
+import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.modifier.Modifiers;
@@ -11,20 +12,15 @@ import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import static com.teampotato.modifiers.ModifiersMod.MODIFIER_BOOK;
-
-@Mod.EventBusSubscriber
 public class Handler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onAnvilUpdate(AnvilUpdateEvent event) {
         ItemStack right = event.getRight();
-        if (ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null &&
-                ForgeRegistries.ITEMS.getKey(right.getItem()) == ForgeRegistries.ITEMS.getKey(MODIFIER_BOOK.get())) {
+        String[] rightItemId = right.getItem().getTranslationKey().split("\\.");
+        if ((rightItemId[1] + rightItemId[2]).equals(ItemModifierBook.ID.toString()) && ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null) {
             Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getNbt().getString(ModifierHandler.bookTagName)));
             if (modifier != null) {
                 ItemStack output = event.getLeft().copy();

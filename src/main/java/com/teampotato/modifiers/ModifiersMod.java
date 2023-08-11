@@ -2,6 +2,7 @@ package com.teampotato.modifiers;
 
 import com.teampotato.modifiers.common.config.*;
 import com.teampotato.modifiers.common.curios.ICurioProxy;
+import com.teampotato.modifiers.common.events.Handler;
 import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifiers;
 import com.teampotato.modifiers.common.network.NetworkHandler;
@@ -29,11 +30,8 @@ public class ModifiersMod {
     public static final DeferredRegister<Item> ITEM_DEFERRED_REGISTER = DeferredRegister.create(ForgeRegistries.ITEMS, MOD_ID);
     public static final RegistryObject<Item> MODIFIER_BOOK;
     public static final Logger LOGGER = LogManager.getLogger();
-
     public static ICurioProxy CURIO_PROXY;
-
     public static ItemGroup GROUP_BOOKS;
-
     public ModifiersMod() {
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         final ModLoadingContext ctx = ModLoadingContext.get();
@@ -41,11 +39,12 @@ public class ModifiersMod {
         NetworkHandler.register();
         ITEM_DEFERRED_REGISTER.register(eventBus);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        ctx.registerConfig(COMMON, ReforgeConfig.CONFIG, "remodifier-reforge.toml");
-        ctx.registerConfig(COMMON, CurioNArmorConfig.CONFIG, "remodifier-armor-n-curio-modifiers.toml");
-        ctx.registerConfig(COMMON, ToolConfig.CONFIG, "remodifier-tool-modifiers.toml");
-        ctx.registerConfig(COMMON, BowConfig.CONFIG, "remodifier-bow-modifiers.toml");
-        ctx.registerConfig(COMMON, ShieldConfig.CONFIG, "remodifier-shield-modifiers.toml");
+        MinecraftForge.EVENT_BUS.register(Handler.class);
+        ctx.registerConfig(COMMON, ReforgeConfig.CONFIG, "remodifier/reforge.toml");
+        ctx.registerConfig(COMMON, CurioNArmorConfig.CONFIG, "remodifier/armor-n-curio-modifiers.toml");
+        ctx.registerConfig(COMMON, ToolConfig.CONFIG, "remodifier/tool-modifiers.toml");
+        ctx.registerConfig(COMMON, BowConfig.CONFIG, "remodifier/bow-modifiers.toml");
+        ctx.registerConfig(COMMON, ShieldConfig.CONFIG, "remodifier/shield-modifiers.toml");
     }
 
     static {

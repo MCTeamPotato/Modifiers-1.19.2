@@ -105,7 +105,7 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
     }
 
     @Override
-    public boolean modifiers_onTab2() {
+    public boolean modifiers_isOnTab2() {
         return modifiers_onTab2;
     }
 
@@ -130,7 +130,6 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         ItemStack stack2 = this.handler.getSlot(1).getStack();
         boolean isUniversal = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
 
-        // TODO add a util function somewhere for `canReforge(stack1, stack2)`
         boolean cantReforge = !stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2);
         if (isUniversal && cantReforge) cantReforge = false;
         // canReforge is also true for empty slot 1. Probably how it should behave.
@@ -146,7 +145,6 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
             }
         }
     }
-
 
     @Override
     protected void init() {

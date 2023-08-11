@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemModifierBook extends Item {
+    public static final Identifier ID = new Identifier("modifiers", "modifier_book");
     public ItemModifierBook() {
         super(new Settings().rarity(Rarity.EPIC).group(ModifiersMod.GROUP_BOOKS));
     }
