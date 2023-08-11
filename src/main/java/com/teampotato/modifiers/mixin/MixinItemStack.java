@@ -14,15 +14,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Item.class)
-public abstract class MixinItem {
-    @Inject(method = "getName(Lnet/minecraft/item/ItemStack;)Lnet/minecraft/text/Text;", at = @At("RETURN"), cancellable = true)
-    private void onGetDisplayName(ItemStack stack, CallbackInfoReturnable<Text> cir) {
-        Modifier modifier = ModifierHandler.getModifier(stack);
+@Mixin(ItemStack.class)
+public abstract class MixinItemStack {
+    @Shadow public abstract Item getItem();
+
+    @Inject(method = "getName", at = @At(value = "RETURN", ordinal = 1), cancellable = true)
+    private void onGetDisplayName(CallbackInfoReturnable<Text> cir) {
+        Modifier modifier = ModifierHandler.getModifier((ItemStack) (Object)this);
         if (modifier != null && modifier != Modifiers.NONE) {
-            cir.setReturnValue(MutableText.of(modifier.getFormattedName()).append(" ").append(MutableText.of(new TranslatableTextContent(this.getTranslationKey(stack)))));
+            cir.setReturnValue(MutableText.of(modifier.getFormattedName()).append(" ").append(MutableText.of(new TranslatableTextContent(this.getItem().getTranslationKey((ItemStack) (Object)this)))));
         }
     }
-
-    @Shadow public abstract String getTranslationKey(ItemStack stack);
 }

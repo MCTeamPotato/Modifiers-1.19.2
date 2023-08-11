@@ -11,13 +11,10 @@
     "defaultRequire": 1
   },
   "client": [
-    "client.MixinForgingScreen",
-    "client.MixinHandledScreen",
-    "client.MixinItemStack",
     "client.MixinSmithingScreen"
   ],
   "mixins": [
-    "MixinItem",
+    "MixinItemStack",
     "MixinSmithingTableContainer"
   ]
 }

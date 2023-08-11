@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -50,5 +51,13 @@ public class Handler {
             ModifierHandler.setModifier(to, toMod);
         }
         ModifierHandler.applyEquipmentModifier(event.getEntity(), toMod, slotType);
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onGetTooltip(ItemTooltipEvent event) {
+        Modifier modifier = ModifierHandler.getModifier(event.getItemStack());
+        if (modifier != null) {
+            event.getToolTip().addAll(modifier.getInfoLines());
+        }
     }
 }

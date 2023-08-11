@@ -65,7 +65,7 @@ public class ModifiersMod {
                 CURIO_PROXY = (ICurioProxy) Class.forName("com.teampotato.modifiers.common.curios.CurioCompat").getDeclaredConstructor().newInstance();
                 MinecraftForge.EVENT_BUS.register(CURIO_PROXY);
             } catch (Exception e) {
-                LOGGER.error("Remodified failed to load Curios compatibility.");
+                LOGGER.error("Remodified failed to load Curios integration.");
                 LOGGER.error(e.getMessage());
             }
         }
