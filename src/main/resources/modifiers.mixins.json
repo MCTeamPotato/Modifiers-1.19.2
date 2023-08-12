@@ -11,6 +11,8 @@
     "defaultRequire": 1
   },
   "client": [
+    "client.MixinForgingScreen",
+    "client.MixinHandledScreen",
     "client.MixinSmithingScreen"
   ],
   "mixins": [
