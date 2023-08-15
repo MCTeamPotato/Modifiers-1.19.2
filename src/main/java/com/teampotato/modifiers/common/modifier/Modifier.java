@@ -1,7 +1,6 @@
 package com.teampotato.modifiers.common.modifier;
 
 import com.teampotato.modifiers.ModifiersMod;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -10,9 +9,7 @@ import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableTextContent;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.server.ServerLifecycleHooks;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
@@ -125,11 +122,7 @@ public class Modifier {
                 EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
                 if (registryAttribute == null) {
                     ModifiersMod.LOGGER.fatal("Invalid key: " + entityAttribute);
-                    if (FMLLoader.getDist().isDedicatedServer()){
-                        ServerLifecycleHooks.getCurrentServer().shutdown();
-                    } else if (FMLLoader.getDist().isClient()) {
-                        MinecraftClient.getInstance().stop();
-                    }
+                    throw new RuntimeException();
                 }
                 modifiers.add(new ImmutablePair<>(registryAttribute, modifier[index]));
             }
