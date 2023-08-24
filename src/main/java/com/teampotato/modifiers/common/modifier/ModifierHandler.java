@@ -36,6 +36,7 @@ public class ModifierHandler {
 
     public static void setModifier(ItemStack stack, Modifier modifier) {
         NbtCompound tag = stack.getOrCreateNbt();
+        tag.remove(tagName);
         tag.putString(tagName, modifier.name.toString());
     }
 

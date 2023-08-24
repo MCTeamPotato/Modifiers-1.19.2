@@ -16,11 +16,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Handler {
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onAnvilUpdate(AnvilUpdateEvent event) {
         ItemStack right = event.getRight();
-        String[] rightItemId = right.getItem().getTranslationKey().split("\\.");
-        if ((rightItemId[1] + rightItemId[2]).equals(ItemModifierBook.ID.toString()) && ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null) {
+        if (right.getItem() instanceof ItemModifierBook && ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null) {
             Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getNbt().getString(ModifierHandler.bookTagName)));
             if (modifier != null) {
                 ItemStack output = event.getLeft().copy();
