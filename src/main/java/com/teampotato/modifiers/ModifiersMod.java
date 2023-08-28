@@ -2,7 +2,8 @@ package com.teampotato.modifiers;
 
 import com.teampotato.modifiers.common.config.*;
 import com.teampotato.modifiers.common.curios.ICurioProxy;
-import com.teampotato.modifiers.common.events.Handler;
+import com.teampotato.modifiers.common.events.ClientEvents;
+import com.teampotato.modifiers.common.events.CommonEvents;
 import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifiers;
 import com.teampotato.modifiers.common.network.NetworkHandler;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -39,7 +41,10 @@ public class ModifiersMod {
         NetworkHandler.register();
         ITEM_DEFERRED_REGISTER.register(eventBus);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(Handler.class);
+        MinecraftForge.EVENT_BUS.register(CommonEvents.class);
+        if (FMLLoader.getDist().isClient()) {
+            MinecraftForge.EVENT_BUS.register(ClientEvents.class);
+        }
         ctx.registerConfig(COMMON, ReforgeConfig.CONFIG, "remodifier/reforge.toml");
         ctx.registerConfig(COMMON, CurioNArmorConfig.CONFIG, "remodifier/armor-n-curio-modifiers.toml");
         ctx.registerConfig(COMMON, ToolConfig.CONFIG, "remodifier/tool-modifiers.toml");
