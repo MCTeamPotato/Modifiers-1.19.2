@@ -1,6 +1,7 @@
 package com.teampotato.modifiers.common.modifier;
 
 import com.teampotato.modifiers.ModifiersMod;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -37,7 +38,7 @@ public class Modifier {
     }
 
     public TranslatableTextContent getFormattedName() {
-        return new TranslatableTextContent("modifier."+name.getNamespace()+"."+name.getPath());
+        return new TranslatableTextContent("modifier." + name.getNamespace() + "." + name.getPath());
     }
 
     @Nullable
@@ -70,7 +71,7 @@ public class Modifier {
     public List<MutableText> getInfoLines() {
         // TODO: probably want a "no effect" description rather than just not showing a description for modifiers with no effect
         //       also maybe "no modifier" for None, idk
-        List<MutableText> lines = new ArrayList<>();
+        List<MutableText> lines = new ObjectArrayList<>();
         int size = modifiers.size();
         if (size < 1) return lines;
         if (size == 1) {
