@@ -32,6 +32,7 @@ public abstract class MixinForgingScreen<T extends ForgingScreenHandler> extends
         super(handler, inventory, title);
     }
 
+    @SuppressWarnings("ConstantValue")
     @Inject(method = "drawBackground", at = @At("HEAD"), cancellable = true)
     private void onDrawBackground(MatrixStack matrixStack, float f, int i, int j, CallbackInfo ci) {
         if (((Object) this) instanceof SmithingScreen) {
@@ -47,7 +48,6 @@ public abstract class MixinForgingScreen<T extends ForgingScreenHandler> extends
                 ItemStack stack2 = this.handler.getSlot(1).getStack();
                 boolean isUniversal = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
 
-                // TODO add a util function somewhere for `canReforge(stack1, stack2)`
                 boolean cantReforge = !stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2);
                 if (isUniversal && cantReforge) cantReforge = false;
                 // canReforge is also true for empty slot 1. Probably how it should behave.
