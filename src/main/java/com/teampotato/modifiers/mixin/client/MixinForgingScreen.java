@@ -46,13 +46,14 @@ public abstract class MixinForgingScreen<T extends ForgingScreenHandler> extends
                 this.drawTexture(matrixStack, k, l, 0, 0, this.backgroundWidth, this.backgroundHeight);
                 ItemStack stack1 = this.handler.getSlot(0).getStack();
                 ItemStack stack2 = this.handler.getSlot(1).getStack();
-                boolean isUniversal = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
-
+                boolean isUniversalReforgeItem = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(stack2.getItem())).toString());
+                // TODO add a util function somewhere for `canReforge(stack1, stack2)`
                 boolean cantReforge = !stack1.isEmpty() && !stack1.getItem().canRepair(stack1, stack2);
-                if (isUniversal && cantReforge) cantReforge = false;
+                if (ReforgeConfig.DISABLE_REPAIR_REFORGED.get() && !cantReforge) cantReforge = true;
+                if (isUniversalReforgeItem && cantReforge) cantReforge = false;
                 // canReforge is also true for empty slot 1. Probably how it should behave.
                 ((SmithingScreenReforge) this).modifiers_setCanReforge(!cantReforge);
-                if (!stack1.isEmpty() && !(stack1.getItem().canRepair(stack1, stack2) || isUniversal)) {
+                if (cantReforge) {
                     this.drawTexture(matrixStack, k + 99 - 53, l + 45, this.backgroundWidth, 0, 28, 21);
                 }
             }

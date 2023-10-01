@@ -29,7 +29,7 @@ public abstract class MixinSmithingTableContainer extends ForgingScreenHandler i
         ItemStack material = input.getStack(1);
 
         if (ModifierHandler.canHaveModifiers(stack)) {
-            if (stack.getItem().canRepair(stack, material) || ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(material.getItem())).toString())) {
+            if ((stack.getItem().canRepair(stack, material) && !ReforgeConfig.DISABLE_REPAIR_REFORGED.get()) || ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(material.getItem())).toString())) {
 
                 boolean hadModifier = ModifierHandler.hasModifier(stack);
                 Modifier modifier = ModifierHandler.rollModifier(stack, ThreadLocalRandom.current());
