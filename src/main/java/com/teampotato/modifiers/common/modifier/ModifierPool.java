@@ -1,10 +1,10 @@
 package com.teampotato.modifiers.common.modifier;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.item.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class ModifierPool {
@@ -12,7 +12,7 @@ public class ModifierPool {
     public int totalWeight = 0;
     // Pool weight, for choosing which pool to use when multiple are applicable.
     public int poolWeight = 0;
-    public List<Modifier> modifiers = new ArrayList<>();
+    public Set<Modifier> modifiers = new ObjectOpenHashSet<>();
 
     public ModifierPool(Predicate<ItemStack> isApplicable) {
         this.isApplicable = isApplicable;

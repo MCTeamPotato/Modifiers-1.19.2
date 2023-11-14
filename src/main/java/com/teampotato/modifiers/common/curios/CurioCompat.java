@@ -19,10 +19,7 @@ public class CurioCompat implements ICurioProxy {
         int slot = event.getSlotIndex();
 
         Modifier modFrom = ModifierHandler.getModifier(event.getFrom());
-        if (modFrom != null) {
-            ModifierHandler.removeCurioModifier(entity, modFrom, identifier, slot);
-        }
-
+        if (modFrom != null) ModifierHandler.removeCurioModifier(entity, modFrom, identifier, slot);
         Modifier modifier = ModifierHandler.getModifier(to);
         if (modifier == null) {
             modifier = ModifierHandler.rollModifier(to, ThreadLocalRandom.current());
@@ -32,7 +29,8 @@ public class CurioCompat implements ICurioProxy {
         ModifierHandler.applyCurioModifier(entity, modifier, identifier, slot);
     }
 
-    @Override public boolean isModifiableCurio(ItemStack stack) {
+    @Override
+    public boolean isModifiableCurio(ItemStack stack) {
         return !CuriosApi.getCuriosHelper().getCurioTags(stack.getItem()).isEmpty();
     }
 }

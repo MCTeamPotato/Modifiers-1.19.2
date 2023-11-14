@@ -1,76 +1,88 @@
 package com.teampotato.modifiers.common.modifier;
 
 import com.teampotato.modifiers.ModifiersMod;
-import com.teampotato.modifiers.common.config.BowConfig;
-import com.teampotato.modifiers.common.config.CurioNArmorConfig;
-import com.teampotato.modifiers.common.config.ShieldConfig;
-import com.teampotato.modifiers.common.config.ToolConfig;
-import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import com.teampotato.modifiers.common.config.toml.*;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.item.*;
 import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Modifiers {
-    public static Map<Identifier, Modifier> MODIFIERS = new Object2ObjectLinkedOpenHashMap<>();
+import static com.teampotato.modifiers.common.config.json.JsonConfigInitialier.*;
 
-    public static Modifier NONE = new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, "none"), "modifier_none", Modifier.ModifierType.BOTH).setWeight(0).build();
+@SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
+public class Modifiers {
+    public static final Map<Identifier, Modifier> MODIFIERS = new Object2ObjectOpenHashMap<>();
+
+    public static final Modifier NONE = new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, "none"), "modifier_none", ModifierType.BOTH).setWeight(0).build();
+
     static {
         MODIFIERS.put(NONE.name, NONE);
     }
 
-    public static ModifierPool curio_pool = new ModifierPool(stack -> {
-        if (stack.getItem() instanceof ArmorItem) return true;
-        return ModifiersMod.CURIO_PROXY.isModifiableCurio(stack);
-    });
+    public static final ModifierPool curioPool = new ModifierPool(stack -> ModifiersMod.CURIO_PROXY.isModifiableCurio(stack));
 
-    public static ModifierPool tool_pool = new ModifierPool(stack -> {
+    public static final ModifierPool armorPool = new ModifierPool(stack -> stack.getItem() instanceof ArmorItem || ModifiersMod.CURIO_PROXY.isModifiableCurio(stack));
+
+    public static final ModifierPool toolPool = new ModifierPool(stack -> {
         Item item = stack.getItem();
         if (item instanceof SwordItem) return true;
         return item instanceof MiningToolItem;
     });
 
-    public static ModifierPool bow_pool = new ModifierPool(stack -> stack.getItem() instanceof RangedWeaponItem);
+    public static final ModifierPool bowPool = new ModifierPool(stack -> stack.getItem() instanceof RangedWeaponItem);
 
-    public static ModifierPool shield_pool = new ModifierPool(stack -> stack.getItem() instanceof ShieldItem);
+    public static final ModifierPool shieldPool = new ModifierPool(stack -> stack.getItem() instanceof ShieldItem);
 
-    private static Modifier.ModifierBuilder curio(String name) {
-        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, Modifier.ModifierType.EQUIPPED);
+    @Contract("_ -> new")
+    private static Modifier.@NotNull ModifierBuilder armor(String name) {
+        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.EQUIPPED);
     }
 
-    private static Modifier.ModifierBuilder tool(String name) {
-        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, Modifier.ModifierType.HELD);
+    @Contract("_ -> new")
+    private static Modifier.@NotNull ModifierBuilder tool(String name) {
+        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.HELD);
     }
 
     private static void addCurio(Modifier modifier) {
         MODIFIERS.put(modifier.name, modifier);
-        curio_pool.add(modifier);
+        curioPool.add(modifier);
+    }
+
+    private static void addArmor(Modifier modifier) {
+        MODIFIERS.put(modifier.name, modifier);
+        armorPool.add(modifier);
     }
 
     private static void addTool(Modifier modifier) {
         MODIFIERS.put(modifier.name, modifier);
-        tool_pool.add(modifier);
+        toolPool.add(modifier);
     }
 
     private static void addBow(Modifier modifier) {
         MODIFIERS.put(modifier.name, modifier);
-        bow_pool.add(modifier);
+        bowPool.add(modifier);
     }
 
     private static void addShield(Modifier modifier) {
         MODIFIERS.put(modifier.name, modifier);
-        shield_pool.add(modifier);
+        shieldPool.add(modifier);
     }
 
-    private static Modifier.AttributeModifierSupplier mod(double amount, Operation op) {
+    @Contract("_, _ -> new")
+    private static Modifier.@NotNull AttributeModifierSupplier mod(double amount, Operation op) {
         return new Modifier.AttributeModifierSupplier(amount, op);
     }
 
-    private static Modifier.AttributeModifierSupplier[] mods(String[] amounts, String[] ops) {
+    private static Modifier.AttributeModifierSupplier @NotNull [] mods(String @NotNull [] amounts, String[] ops) {
         Modifier.AttributeModifierSupplier[] suppliers = new Modifier.AttributeModifierSupplier[amounts.length];
         for (String amount : amounts) {
             int index = List.of(amounts).indexOf(amount);
@@ -79,14 +91,19 @@ public class Modifiers {
         return suppliers;
     }
 
+    @Contract("_, _ -> new")
+    private static @NotNull List<? extends String> merge(@NotNull Iterable<? extends String> iterable1, @NotNull Iterable<? extends String> iterable2) {
+        return new ObjectArrayList<>(new MergedStringIterator(iterable1.iterator(), iterable2.iterator()));
+    }
+
     private static void initBowModifiers() {
-        List<? extends String> MODIFIERS_NAMES = BowConfig.NAMES.get();
-        List<? extends String> MODIFIERS_WEIGHTS = BowConfig.WEIGHTS.get();
-        List<? extends String> MODIFIERS_ATTRIBUTES = BowConfig.ATTRIBUTES.get();
-        List<? extends String> MODIFIERS_AMOUNTS = BowConfig.AMOUNTS.get();
-        List<? extends String> MODIFIERS_OPERATIONS_IDS = BowConfig.OPERATIONS_IDS.get();
-        for (String name : MODIFIERS_NAMES) {
-            int index = MODIFIERS_NAMES.indexOf(name);
+        List<? extends String> MODIFIERS_NAMES = merge(BowConfig.NAMES.get(), BOW_NAMES);
+        List<? extends String> MODIFIERS_WEIGHTS = merge(BowConfig.WEIGHTS.get(), BOW_WEIGHTS);
+        List<? extends String> MODIFIERS_ATTRIBUTES = merge(BowConfig.ATTRIBUTES.get(), BOW_ATTRIBUTES);
+        List<? extends String> MODIFIERS_AMOUNTS = merge(BowConfig.AMOUNTS.get(), BOW_AMOUNTS);
+        List<? extends String> MODIFIERS_OPERATIONS_IDS = merge(BowConfig.OPERATIONS_IDS.get(), BOW_OPERATIONS_IDS);
+        for (int index = 0; index < MODIFIERS_NAMES.size(); index++) {
+            String name = MODIFIERS_NAMES.get(index);
             String weight = MODIFIERS_WEIGHTS.get(index);
             String attribute = MODIFIERS_ATTRIBUTES.get(index);
             String amount = MODIFIERS_AMOUNTS.get(index);
@@ -108,13 +125,13 @@ public class Modifiers {
     }
 
     private static void initShieldModifiers() {
-        List<? extends String> MODIFIERS_NAMES = ShieldConfig.NAMES.get();
-        List<? extends String> MODIFIERS_WEIGHTS = ShieldConfig.WEIGHTS.get();
-        List<? extends String> MODIFIERS_ATTRIBUTES = ShieldConfig.ATTRIBUTES.get();
-        List<? extends String> MODIFIERS_AMOUNTS = ShieldConfig.AMOUNTS.get();
-        List<? extends String> MODIFIERS_OPERATIONS_IDS = ShieldConfig.OPERATIONS_IDS.get();
-        for (String name : MODIFIERS_NAMES) {
-            int index = MODIFIERS_NAMES.indexOf(name);
+        List<? extends String> MODIFIERS_NAMES = merge(ShieldConfig.NAMES.get(), SHIELD_NAMES);
+        List<? extends String> MODIFIERS_WEIGHTS = merge(ShieldConfig.WEIGHTS.get(), SHIELD_WEIGHTS);
+        List<? extends String> MODIFIERS_ATTRIBUTES = merge(ShieldConfig.ATTRIBUTES.get(), SHIELD_ATTRIBUTES);
+        List<? extends String> MODIFIERS_AMOUNTS = merge(ShieldConfig.AMOUNTS.get(), SHIELD_AMOUNTS);
+        List<? extends String> MODIFIERS_OPERATIONS_IDS = merge(ShieldConfig.OPERATIONS_IDS.get(), SHIELD_OPERATIONS_IDS);
+        for (int index = 0; index < MODIFIERS_NAMES.size(); index++) {
+            String name = MODIFIERS_NAMES.get(index);
             String weight = MODIFIERS_WEIGHTS.get(index);
             String attribute = MODIFIERS_ATTRIBUTES.get(index);
             String amount = MODIFIERS_AMOUNTS.get(index);
@@ -136,13 +153,13 @@ public class Modifiers {
     }
 
     private static void initToolModifiers() {
-        List<? extends String> MODIFIERS_NAMES = ToolConfig.NAMES.get();
-        List<? extends String> MODIFIERS_WEIGHTS = ToolConfig.WEIGHTS.get();
-        List<? extends String> MODIFIERS_ATTRIBUTES = ToolConfig.ATTRIBUTES.get();
-        List<? extends String> MODIFIERS_AMOUNTS = ToolConfig.AMOUNTS.get();
-        List<? extends String> MODIFIERS_OPERATIONS_IDS = ToolConfig.OPERATIONS_IDS.get();
-        for (String name : MODIFIERS_NAMES) {
-            int index = MODIFIERS_NAMES.indexOf(name);
+        List<? extends String> MODIFIERS_NAMES = merge(ToolConfig.NAMES.get(), TOOL_NAMES);
+        List<? extends String> MODIFIERS_WEIGHTS = merge(ToolConfig.WEIGHTS.get(), TOOL_WEIGHTS);
+        List<? extends String> MODIFIERS_ATTRIBUTES = merge(ToolConfig.ATTRIBUTES.get(), TOOL_ATTRIBUTES);
+        List<? extends String> MODIFIERS_AMOUNTS = merge(ToolConfig.AMOUNTS.get(), TOOL_AMOUNTS);
+        List<? extends String> MODIFIERS_OPERATIONS_IDS = merge(ToolConfig.OPERATIONS_IDS.get(), TOOL_OPERATIONS_IDS);
+        for (int index = 0; index < MODIFIERS_NAMES.size(); index++) {
+            String name = MODIFIERS_NAMES.get(index);
             String weight = MODIFIERS_WEIGHTS.get(index);
             String attribute = MODIFIERS_ATTRIBUTES.get(index);
             String amount = MODIFIERS_AMOUNTS.get(index);
@@ -163,14 +180,14 @@ public class Modifiers {
         }
     }
 
-    private static void initCuriosNArmorsModifiers() {
-        List<? extends String> MODIFIERS_NAMES = CurioNArmorConfig.NAMES.get();
-        List<? extends String> MODIFIERS_WEIGHTS = CurioNArmorConfig.WEIGHTS.get();
-        List<? extends String> MODIFIERS_ATTRIBUTES = CurioNArmorConfig.ATTRIBUTES.get();
-        List<? extends String> MODIFIERS_AMOUNTS = CurioNArmorConfig.AMOUNTS.get();
-        List<? extends String> MODIFIERS_OPERATIONS_IDS = CurioNArmorConfig.OPERATIONS_IDS.get();
-        for (String name : MODIFIERS_NAMES) {
-            int index = MODIFIERS_NAMES.indexOf(name);
+    private static void initArmorsModifiers() {
+        List<? extends String> MODIFIERS_NAMES = merge(ArmorConfig.NAMES.get(), ARMOR_NAMES);
+        List<? extends String> MODIFIERS_WEIGHTS = merge(ArmorConfig.WEIGHTS.get(), ARMOR_WEIGHTS);
+        List<? extends String> MODIFIERS_ATTRIBUTES = merge(ArmorConfig.ATTRIBUTES.get(), ARMOR_ATTRIBUTES);
+        List<? extends String> MODIFIERS_AMOUNTS = merge(ArmorConfig.AMOUNTS.get(), ARMOR_AMOUNTS);
+        List<? extends String> MODIFIERS_OPERATIONS_IDS = merge(ArmorConfig.OPERATIONS_IDS.get(), ARMOR_OPERATIONS_IDS);
+        for (int index = 0; index < MODIFIERS_NAMES.size(); index++) {
+            String name = MODIFIERS_NAMES.get(index);
             String weight = MODIFIERS_WEIGHTS.get(index);
             String attribute = MODIFIERS_ATTRIBUTES.get(index);
             String amount = MODIFIERS_AMOUNTS.get(index);
@@ -179,18 +196,70 @@ public class Modifiers {
                 String[] attributes = attribute.split(";");
                 String[] amounts = amount.split(";");
                 String[] operations_ids = operations_id.split(";");
-                addCurio(curio(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
+                addCurio(armor(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addCurio(curio(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addCurio(armor(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }
         }
     }
 
+    private static void initCuriosModifiers() {
+        List<? extends String> MODIFIERS_NAMES = merge(CuriosConfig.NAMES.get(), CURIOS_NAMES);
+        List<? extends String> MODIFIERS_WEIGHTS = merge(CuriosConfig.WEIGHTS.get(), CURIOS_WEIGHTS);
+        List<? extends String> MODIFIERS_ATTRIBUTES = merge(CuriosConfig.ATTRIBUTES.get(), CURIOS_ATTRIBUTES);
+        List<? extends String> MODIFIERS_AMOUNTS = merge(CuriosConfig.AMOUNTS.get(), CURIOS_AMOUNTS);
+        List<? extends String> MODIFIERS_OPERATIONS_IDS = merge(CuriosConfig.OPERATIONS_IDS.get(), CURIOS_OPERATIONS_IDS);
+        for (int index = 0; index < MODIFIERS_NAMES.size(); index++) {
+            String name = MODIFIERS_NAMES.get(index);
+            String weight = MODIFIERS_WEIGHTS.get(index);
+            String attribute = MODIFIERS_ATTRIBUTES.get(index);
+            String amount = MODIFIERS_AMOUNTS.get(index);
+            String operations_id = MODIFIERS_OPERATIONS_IDS.get(index);
+            if (attribute.contains(";")) {
+                String[] attributes = attribute.split(";");
+                String[] amounts = amount.split(";");
+                String[] operations_ids = operations_id.split(";");
+                addArmor(armor(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
+            } else {
+                addArmor(armor(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+            }
+        }
+    }
 
-    public static void init() {
+    public static void initialize() {
         initToolModifiers();
-        initCuriosNArmorsModifiers();
+        initArmorsModifiers();
         initBowModifiers();
         initShieldModifiers();
+        if (ModifiersMod.isCuriosLoaded() && !CuriosConfig.WHETHER_OR_NOT_CURIOS_USE_ARMOR_MODIFIERS.get()) initCuriosModifiers();
+    }
+
+    static class MergedStringIterator implements Iterator<String> {
+        private final Iterator<? extends String> iterator1;
+        private final Iterator<? extends String> iterator2;
+        private boolean useIterator1;
+
+        public MergedStringIterator(Iterator<? extends String> iterator1, Iterator<? extends String> iterator2) {
+            this.iterator1 = iterator1;
+            this.iterator2 = iterator2;
+            this.useIterator1 = true;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return (useIterator1 && iterator1.hasNext()) || iterator2.hasNext();
+        }
+
+        @Override
+        public String next() {
+            if (useIterator1) {
+                if (iterator1.hasNext()) {
+                    return iterator1.next();
+                } else {
+                    useIterator1 = false;
+                }
+            }
+            return iterator2.next();
+        }
     }
 }

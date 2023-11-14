@@ -21,7 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class ItemModifierBook extends Item {
-    public static final Identifier ID = new Identifier("modifiers", "modifier_book");
     public ItemModifierBook() {
         super(new Settings().rarity(Rarity.EPIC).group(ModifiersMod.GROUP_BOOKS));
     }
@@ -36,44 +35,41 @@ public class ItemModifierBook extends Item {
 
     @Override
     public void appendStacks(ItemGroup group, DefaultedList<ItemStack> items) {
-        // FIXME make variants display in JEI
-        if (this.isIn(group)) {
-            items.addAll(getStacks());
-        }
+        if (this.isIn(group)) items.addAll(getStacks());
     }
 
     @Override
     public Text getName(ItemStack stack) {
         Text base = super.getName(stack);
-        if (!stack.hasNbt() || (stack.getNbt() != null &&!stack.getNbt().contains(ModifierHandler.bookTagName))) return base;
-        Modifier mod = com.teampotato.modifiers.common.modifier.Modifiers.MODIFIERS.get(new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
+        if (!stack.hasNbt() || (stack.getNbt() != null && !stack.getNbt().contains(ModifierHandler.bookTagName))) return base;
+        Modifier mod = Modifiers.MODIFIERS.get(new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
         if (mod == null) return base;
         return Text.translatable("misc.modifiers.modifier_prefix").append(MutableText.of(mod.getFormattedName()));
     }
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World worldIn,
-                              List<Text> tooltip, TooltipContext flagIn) {
+    public void appendTooltip(ItemStack stack, @Nullable World worldIn, List<Text> tooltip, TooltipContext flagIn) {
+        String translationKey = this.getTranslationKey();
         if (stack.getNbt() != null && stack.getNbt().contains(ModifierHandler.bookTagName)) {
-            Modifier mod = com.teampotato.modifiers.common.modifier.Modifiers.MODIFIERS.get(
-                    new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
+            Modifier mod = Modifiers.MODIFIERS.get(new Identifier(stack.getNbt().getString(ModifierHandler.bookTagName)));
             if (mod != null) {
                 tooltip.addAll(mod.getInfoLines());
-                tooltip.add(Text.translatable(this.getTranslationKey() + ".tooltip.0"));
-                tooltip.add(Text.translatable(this.getTranslationKey() + ".tooltip.1"));
+                tooltip.add(Text.translatable(translationKey + ".tooltip.0"));
+                tooltip.add(Text.translatable(translationKey + ".tooltip.1"));
                 return;
             }
         }
-        tooltip.add(Text.translatable(this.getTranslationKey()+".tooltip.invalid"));
+        tooltip.add(Text.translatable(translationKey + ".tooltip.invalid"));
     }
 
     protected List<ItemStack> getStacks() {
         List<Modifier> modifiers = new ObjectArrayList<>();
         modifiers.add(Modifiers.NONE);
-        modifiers.addAll(Modifiers.curio_pool.modifiers);
-        modifiers.addAll(Modifiers.tool_pool.modifiers);
-        modifiers.addAll(Modifiers.shield_pool.modifiers);
-        modifiers.addAll(Modifiers.bow_pool.modifiers);
+        modifiers.addAll(Modifiers.curioPool.modifiers);
+        modifiers.addAll(Modifiers.toolPool.modifiers);
+        modifiers.addAll(Modifiers.shieldPool.modifiers);
+        modifiers.addAll(Modifiers.bowPool.modifiers);
+        modifiers.addAll(Modifiers.armorPool.modifiers);
 
         List<ItemStack> stacks = new ObjectArrayList<>();
         for (Modifier mod : modifiers) {

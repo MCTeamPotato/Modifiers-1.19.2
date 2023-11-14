@@ -6,6 +6,8 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.thread.ThreadExecutor;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
@@ -26,11 +28,13 @@ public class NetworkHandler {
                 PacketC2SReforge::new, mainThreadHandler(PacketC2SReforge.Handler::handle));
     }
 
-    private static <T> BiConsumer<T, PacketContext> mainThreadHandler(Consumer<? super T> handler) {
+    @Contract(pure = true)
+    private static <T> @NotNull BiConsumer<T, PacketContext> mainThreadHandler(Consumer<? super T> handler) {
         return (packet, ctx) -> ctx.threadExecutor.submit(() -> handler.accept(packet));
     }
 
-    private static <T> BiConsumer<T, PacketContext> mainThreadHandler(BiConsumer<? super T, PacketContext> handler) {
+    @Contract(pure = true)
+    private static <T> @NotNull BiConsumer<T, PacketContext> mainThreadHandler(BiConsumer<? super T, PacketContext> handler) {
         return (packet, ctx) -> ctx.threadExecutor.submit(() -> handler.accept(packet, ctx));
     }
 

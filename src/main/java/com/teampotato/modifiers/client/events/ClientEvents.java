@@ -1,4 +1,4 @@
-package com.teampotato.modifiers.common.events;
+package com.teampotato.modifiers.client.events;
 
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;

@@ -20,17 +20,17 @@ public class ModifierHandler {
     public static final String bookTagName = "bookModifier";
 
     public static boolean canHaveModifiers(ItemStack stack) {
-        return !stack.isEmpty() && stack.getMaxCount() <= 1 /* && stack.getItem() != ModItems.modifier_book*/;
+        return !stack.isEmpty() && stack.getMaxCount() <= 1;
     }
 
     @Nullable
     public static Modifier rollModifier(ItemStack stack, Random random) {
         if (!canHaveModifiers(stack)) return null;
-        // TODO if multiple pools applicable, roll between them
-        if (Modifiers.curio_pool.isApplicable.test(stack)) return Modifiers.curio_pool.roll(random);
-        if (Modifiers.tool_pool.isApplicable.test(stack)) return Modifiers.tool_pool.roll(random);
-        if (Modifiers.bow_pool.isApplicable.test(stack)) return Modifiers.bow_pool.roll(random);
-        if (Modifiers.shield_pool.isApplicable.test(stack)) return Modifiers.shield_pool.roll(random);
+        if (Modifiers.curioPool.isApplicable.test(stack)) return Modifiers.curioPool.roll(random);
+        if (Modifiers.toolPool.isApplicable.test(stack)) return Modifiers.toolPool.roll(random);
+        if (Modifiers.bowPool.isApplicable.test(stack)) return Modifiers.bowPool.roll(random);
+        if (Modifiers.shieldPool.isApplicable.test(stack)) return Modifiers.shieldPool.roll(random);
+        if (Modifiers.armorPool.isApplicable.test(stack)) return Modifiers.armorPool.roll(random);
         return null;
     }
 
@@ -45,7 +45,8 @@ public class ModifierHandler {
         return tag != null && tag.contains(tagName);
     }
 
-    @Nullable public static Modifier getModifier(ItemStack stack) {
+    @Nullable
+    public static Modifier getModifier(ItemStack stack) {
         NbtCompound tag = stack.getNbt();
         if (tag == null) return null;
         if (!tag.contains(tagName)) return null;
@@ -60,7 +61,7 @@ public class ModifierHandler {
     }
 
     public static void applyCurioModifier(LivingEntity entity, Modifier modifier, String slotIdentifier, int index) {
-        if (modifier.type == Modifier.ModifierType.HELD) {
+        if (modifier.type == ModifierType.HELD) {
             return;
         }
         for (int i = 0; i < modifier.modifiers.size(); i++) {
@@ -90,8 +91,8 @@ public class ModifierHandler {
     }
 
     public static void applyEquipmentModifier(LivingEntity entity, Modifier modifier, EquipmentSlot type) {
-        if (modifier.type == Modifier.ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR
-                || modifier.type == Modifier.ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) {
+        if (modifier.type == ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR
+                || modifier.type == ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) {
             return;
         }
         for (int i = 0; i < modifier.modifiers.size(); i++) {

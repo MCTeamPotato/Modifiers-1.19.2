@@ -3,7 +3,7 @@ package com.teampotato.modifiers.mixin;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.reforge.SmithingScreenHandlerReforge;
-import com.teampotato.modifiers.common.config.ReforgeConfig;
+import com.teampotato.modifiers.common.config.toml.ReforgeConfig;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ForgingScreenHandler;
@@ -24,21 +24,20 @@ public abstract class MixinSmithingTableContainer extends ForgingScreenHandler i
 
     @Override
     public void modifiers$tryReforge() {
-        ItemStack stack = input.getStack(0);
-        ItemStack material = input.getStack(1);
+        ItemStack stack = this.input.getStack(0);
+        ItemStack material = this.input.getStack(1);
+        if (!ModifierHandler.canHaveModifiers(stack)) return;
+        boolean canRepair = stack.getItem().canRepair(stack, material) && !ReforgeConfig.DISABLE_REPAIR_REFORGED.get();
+        boolean isUniversal = ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(material.getItem())).toString());
 
-        if (ModifierHandler.canHaveModifiers(stack)) {
-            if ((stack.getItem().canRepair(stack, material) && !ReforgeConfig.DISABLE_REPAIR_REFORGED.get()) || ReforgeConfig.UNIVERSAL_REFORGE_ITEM.get().equals(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(material.getItem())).toString())) {
-
-                boolean hadModifier = ModifierHandler.hasModifier(stack);
-                Modifier modifier = ModifierHandler.rollModifier(stack, ThreadLocalRandom.current());
-                if (modifier != null) {
-                    ModifierHandler.setModifier(stack, modifier);
-                    if (hadModifier) {
-                        material.decrement(1);
-                        // We do this for markDirty() mostly, I think
-                        input.setStack(1, material);
-                    }
+        if (canRepair|| isUniversal) {
+            boolean hadModifier = ModifierHandler.hasModifier(stack);
+            Modifier modifier = ModifierHandler.rollModifier(stack, ThreadLocalRandom.current());
+            if (modifier != null) {
+                ModifierHandler.setModifier(stack, modifier);
+                if (hadModifier) {
+                    material.decrement(1);
+                    this.input.setStack(1, material);
                 }
             }
         }

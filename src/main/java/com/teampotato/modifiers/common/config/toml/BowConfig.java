@@ -1,4 +1,4 @@
-package com.teampotato.modifiers.common.config;
+package com.teampotato.modifiers.common.config.toml;
 
 import com.google.common.collect.Lists;
 import net.minecraftforge.common.ForgeConfigSpec;

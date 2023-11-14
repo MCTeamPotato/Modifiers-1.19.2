@@ -25,12 +25,9 @@ loom {
 
 repositories {
     maven { url = "https://maven.theillusivec4.top/" }
-    maven { url = 'https://jitpack.io' }
 }
 
 dependencies {
-    modImplementation "com.github.MCTeamPotato:Potattributes:${project.potattributes_version}"
-    include "com.github.MCTeamPotato:Potattributes:${project.potattributes_version}"
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:1.19.2+build.28:v2"
     forge "net.minecraftforge:forge:${project.forge_version}"

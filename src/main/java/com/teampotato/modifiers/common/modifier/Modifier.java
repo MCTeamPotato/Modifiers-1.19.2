@@ -1,6 +1,5 @@
 package com.teampotato.modifiers.common.modifier;
 
-import com.teampotato.modifiers.ModifiersMod;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
@@ -13,9 +12,10 @@ import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -28,6 +28,7 @@ public class Modifier {
     public final int weight;
     public final ModifierType type;
     public final List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers;
+
 
     private Modifier(Identifier name, String debugName, int weight, ModifierType type, List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers) {
         this.name = name;
@@ -69,8 +70,6 @@ public class Modifier {
     }
 
     public List<MutableText> getInfoLines() {
-        // TODO: probably want a "no effect" description rather than just not showing a description for modifiers with no effect
-        //       also maybe "no modifier" for None, idk
         List<MutableText> lines = new ObjectArrayList<>();
         int size = modifiers.size();
         if (size < 1) return lines;
@@ -89,17 +88,12 @@ public class Modifier {
         return lines;
     }
 
-    // TODO might want to distinguish between curio slots and armor slots in future, too
-    public enum ModifierType {
-        EQUIPPED, HELD, BOTH
-    }
-
     public static class ModifierBuilder {
         int weight = 100;
         final Identifier name;
         final String debugName;
         final ModifierType type;
-        List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers = new ArrayList<>();
+        List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers = new ObjectArrayList<>();
 
         public ModifierBuilder(Identifier name, String debugName, ModifierType type) {
             this.name = name;
@@ -122,8 +116,7 @@ public class Modifier {
                 int index = Arrays.asList(attribute).indexOf(entityAttribute);
                 EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
                 if (registryAttribute == null) {
-                    ModifiersMod.LOGGER.fatal("Invalid key: " + entityAttribute);
-                    throw new RuntimeException();
+                    throw new RuntimeException("Invalid key: " + entityAttribute);
                 }
                 modifiers.add(new ImmutablePair<>(registryAttribute, modifier[index]));
             }
@@ -137,7 +130,8 @@ public class Modifier {
 
     public record AttributeModifierSupplier(double amount, EntityAttributeModifier.Operation operation) {
 
-        public EntityAttributeModifier getAttributeModifier(UUID id, String name) {
+        @Contract(value = "_, _ -> new", pure = true)
+        public @NotNull EntityAttributeModifier getAttributeModifier(UUID id, String name) {
             return new EntityAttributeModifier(id, name, amount, operation);
         }
     }

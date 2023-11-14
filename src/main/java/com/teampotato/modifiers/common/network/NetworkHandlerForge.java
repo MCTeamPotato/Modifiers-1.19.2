@@ -16,9 +16,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class NetworkHandlerForge implements NetworkHandlerProxy {
-    private static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            new Identifier("modifiers", "net"), ()->"", (a)->true, (a)->true
-    );
+    private static final SimpleChannel channel = NetworkRegistry.newSimpleChannel(new Identifier("modifiers", "net"), ()->"", (a)->true, (a)->true);
 
     private static NetworkHandler.PacketContext convertContext(NetworkEvent.Context context) {
         ThreadExecutor<?> executor = LogicalSidedProvider.WORKQUEUE.get(context.getDirection().getReceptionSide());

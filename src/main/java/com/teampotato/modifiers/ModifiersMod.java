@@ -1,8 +1,8 @@
 package com.teampotato.modifiers;
 
-import com.teampotato.modifiers.common.config.*;
+import com.teampotato.modifiers.common.config.toml.*;
 import com.teampotato.modifiers.common.curios.ICurioProxy;
-import com.teampotato.modifiers.common.events.ClientEvents;
+import com.teampotato.modifiers.client.events.ClientEvents;
 import com.teampotato.modifiers.common.events.CommonEvents;
 import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifiers;
@@ -34,49 +34,58 @@ public class ModifiersMod {
     public static final Logger LOGGER = LogManager.getLogger();
     public static ICurioProxy CURIO_PROXY;
     public static ItemGroup GROUP_BOOKS;
+
     public ModifiersMod() {
-        final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus forgeBus = MinecraftForge.EVENT_BUS;
         final ModLoadingContext ctx = ModLoadingContext.get();
-        final ModConfig.Type COMMON = ModConfig.Type.COMMON;
+        final ModConfig.Type common = ModConfig.Type.COMMON;
         NetworkHandler.register();
-        ITEM_DEFERRED_REGISTER.register(eventBus);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
-        MinecraftForge.EVENT_BUS.register(CommonEvents.class);
-        if (FMLLoader.getDist().isClient()) {
-            MinecraftForge.EVENT_BUS.register(ClientEvents.class);
-        }
-        ctx.registerConfig(COMMON, ReforgeConfig.CONFIG, "remodifier/reforge.toml");
-        ctx.registerConfig(COMMON, CurioNArmorConfig.CONFIG, "remodifier/armor-n-curio-modifiers.toml");
-        ctx.registerConfig(COMMON, ToolConfig.CONFIG, "remodifier/tool-modifiers.toml");
-        ctx.registerConfig(COMMON, BowConfig.CONFIG, "remodifier/bow-modifiers.toml");
-        ctx.registerConfig(COMMON, ShieldConfig.CONFIG, "remodifier/shield-modifiers.toml");
+        ITEM_DEFERRED_REGISTER.register(modEventBus);
+        modEventBus.addListener(this::setup);
+        forgeBus.register(CommonEvents.class);
+        if (FMLLoader.getDist().isClient()) forgeBus.register(ClientEvents.class);
+        ctx.registerConfig(common, ReforgeConfig.CONFIG, "remodifier/reforge.toml");
+        ctx.registerConfig(common, ArmorConfig.CONFIG, "remodifier/armor-modifiers.toml");
+        ctx.registerConfig(common, ToolConfig.CONFIG, "remodifier/tool-modifiers.toml");
+        ctx.registerConfig(common, BowConfig.CONFIG, "remodifier/bow-modifiers.toml");
+        ctx.registerConfig(common, ShieldConfig.CONFIG, "remodifier/shield-modifiers.toml");
+        ctx.registerConfig(common, CuriosConfig.CONFIG, "remodifier/curios-modifiers.toml");
     }
 
     static {
         NetworkHandler.setProxy(new NetworkHandlerForge());
 
         GROUP_BOOKS = new ItemGroup(-1, MOD_ID +"_books") {
+            static ItemStack icon;
             @Override
             public ItemStack createIcon() {
-                return MODIFIER_BOOK.get().getDefaultStack();
+                if (icon == null) icon = MODIFIER_BOOK.get().getDefaultStack();
+                return icon;
             }
         };
     }
 
+    private static Boolean isCuriosLoaded = null;
+
+    public static boolean isCuriosLoaded() {
+        if (isCuriosLoaded == null) isCuriosLoaded = ModList.get().isLoaded("curios");
+        return isCuriosLoaded;
+    }
+
     private void setup(final FMLCommonSetupEvent event) {
-        if (ModList.get().isLoaded("curios")) {
-            try {
-                CURIO_PROXY = (ICurioProxy) Class.forName("com.teampotato.modifiers.common.curios.CurioCompat").getDeclaredConstructor().newInstance();
-                MinecraftForge.EVENT_BUS.register(CURIO_PROXY);
-            } catch (Exception e) {
-                LOGGER.error("Remodifier failed to load Curios integration.");
-                LOGGER.error(e.getMessage());
+        event.enqueueWork(() -> {
+            if (isCuriosLoaded()) {
+                try {
+                    CURIO_PROXY = (ICurioProxy) Class.forName("com.teampotato.modifiers.common.curios.CurioCompat").getDeclaredConstructor().newInstance();
+                    MinecraftForge.EVENT_BUS.register(CURIO_PROXY);
+                } catch (Exception e) {
+                    LOGGER.error("Remodifier failed to load Curios integration.", e);
+                }
             }
-        }
-        if (CURIO_PROXY == null) {
-            CURIO_PROXY = new ICurioProxy() {};
-        }
-        Modifiers.init();
+            if (CURIO_PROXY == null) CURIO_PROXY = new ICurioProxy() {};
+            Modifiers.initialize();
+        });
     }
 
     static {
