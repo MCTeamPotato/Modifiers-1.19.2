@@ -13,6 +13,7 @@ public class ArmorConfig {
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> AMOUNTS;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> OPERATIONS_IDS;
 
+
     static {
         ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
         BUILDER.push("Modifiers for armors");
