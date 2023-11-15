@@ -1,9 +1,9 @@
 package com.teampotato.modifiers.mixin;
 
+import com.teampotato.modifiers.common.config.toml.ReforgeConfig;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.reforge.SmithingScreenHandlerReforge;
-import com.teampotato.modifiers.common.config.toml.ReforgeConfig;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ForgingScreenHandler;

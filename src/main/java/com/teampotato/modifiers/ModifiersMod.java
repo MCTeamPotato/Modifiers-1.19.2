@@ -1,8 +1,8 @@
 package com.teampotato.modifiers;
 
+import com.teampotato.modifiers.client.events.ClientEvents;
 import com.teampotato.modifiers.common.config.toml.*;
 import com.teampotato.modifiers.common.curios.ICurioProxy;
-import com.teampotato.modifiers.client.events.ClientEvents;
 import com.teampotato.modifiers.common.events.CommonEvents;
 import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifiers;

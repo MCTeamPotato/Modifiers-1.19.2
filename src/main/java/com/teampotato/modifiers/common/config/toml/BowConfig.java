@@ -16,6 +16,7 @@ public class BowConfig {
     static {
         ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
         BUILDER.push("Modifiers for bows or crossbows");
+        BUILDER.comment("You may need to make a resource pack to save the customization-required translation key for the attributes if the mod author didn't do that, or your customization on other mods' attribute may not look well", "A hint on the translation key format: attribute.modxxx.attributexxx, e.g. attribute.minecraft.generic.attack_damage");
         NAMES = BUILDER.comment("The name of the modifier").defineList("NAMES", Lists.newArrayList(), o -> true);
         WEIGHTS = BUILDER.comment("The weight of the modifier in the modifiers pool").defineList("WEIGHTS", Lists.newArrayList(), o -> true);
         ATTRIBUTES = BUILDER.comment("The attribute of the modifier has. One modifier can have multiple attributes. Use ';' to split different attributes").defineList("ATTRIBUTES", Lists.newArrayList(), o -> true);
