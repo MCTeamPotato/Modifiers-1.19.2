@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
@@ -90,17 +91,16 @@ public class ModifierHandler {
         return new UUID(COMMON_SEGMENT_EQUIPMENT, second);
     }
 
-    public static void applyEquipmentModifier(LivingEntity entity, Modifier modifier, EquipmentSlot type) {
-        if (modifier.type == ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR
-                || modifier.type == ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) {
-            return;
-        }
+    public static void applyEquipmentModifier(LivingEntity entity, @NotNull Modifier modifier, EquipmentSlot type) {
+        if (modifier.type == ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) return;
+        if (modifier.type == ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR) return;
+
         for (int i = 0; i < modifier.modifiers.size(); i++) {
             Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getEquipmentUuid(type, i);
             EntityAttributeInstance instance = entity.getAttributeInstance(entry.getKey());
             if (instance != null && instance.getModifier(id) == null) {
-                instance.addTemporaryModifier(entry.getValue().getAttributeModifier(id, "equipment_modifier_"+modifier.debugName));
+                instance.addTemporaryModifier(entry.getValue().getAttributeModifier(id, "equipment_modifier_" + modifier.debugName));
             }
         }
     }
