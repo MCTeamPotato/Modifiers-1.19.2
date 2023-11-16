@@ -30,7 +30,7 @@ public class Modifiers {
 
     public static final ModifierPool curioPool = new ModifierPool(stack -> ModifiersMod.CURIO_PROXY.isModifiableCurio(stack));
 
-    public static final ModifierPool armorPool = new ModifierPool(stack -> stack.getItem() instanceof ArmorItem || ModifiersMod.CURIO_PROXY.isModifiableCurio(stack));
+    public static final ModifierPool armorPool = new ModifierPool(stack -> stack.getItem() instanceof ArmorItem || CuriosConfig.WHETHER_OR_NOT_CURIOS_USE_ARMOR_MODIFIERS.get() && ModifiersMod.CURIO_PROXY.isModifiableCurio(stack));
 
     public static final ModifierPool toolPool = new ModifierPool(stack -> {
         Item item = stack.getItem();
@@ -219,9 +219,9 @@ public class Modifiers {
                 String[] attributes = attribute.split(";");
                 String[] amounts = amount.split(";");
                 String[] operations_ids = operations_id.split(";");
-                addArmor(armor(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
+                addCurio(armor(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addArmor(armor(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addCurio(armor(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }
         }
     }
