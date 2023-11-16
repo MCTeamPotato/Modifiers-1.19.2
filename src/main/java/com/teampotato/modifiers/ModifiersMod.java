@@ -74,6 +74,7 @@ public class ModifiersMod {
     }
 
     private void setup(final FMLCommonSetupEvent event) {
+        Modifiers.initialize();
         event.enqueueWork(() -> {
             if (isCuriosLoaded()) {
                 try {
@@ -84,7 +85,6 @@ public class ModifiersMod {
                 }
             }
             if (CURIO_PROXY == null) CURIO_PROXY = new ICurioProxy() {};
-            Modifiers.initialize();
         });
     }
 
