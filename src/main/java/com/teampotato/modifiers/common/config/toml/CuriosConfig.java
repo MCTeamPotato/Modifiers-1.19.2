@@ -16,7 +16,7 @@ public class CuriosConfig {
 
     static {
         ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
-        BUILDER.push("Modifiers for shields");
+        BUILDER.push("Modifiers for curios");
         BUILDER.comment("You may need to make a resource pack to save the customization-required translation key for the attributes if the mod author didn't do that, or your customization on other mods' attribute may not look well", "A hint on the translation key format: attribute.modxxx.attributexxx, e.g. attribute.minecraft.generic.attack_damage");
         WHETHER_OR_NOT_CURIOS_USE_ARMOR_MODIFIERS = BUILDER.comment("When enabled, the below configurations will be ignored and your curio items will use armor modifiers.").define("WhetherOrNotCuriosUseArmorModifiers", true);
         NAMES = BUILDER.comment("The name of the modifier").defineList("NAMES", Lists.newArrayList(), o -> true);

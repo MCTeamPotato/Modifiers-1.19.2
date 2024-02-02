@@ -1,5 +1,6 @@
 package com.teampotato.modifiers.common.config.json;
 
+import com.google.common.base.Suppliers;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.teampotato.modifiers.ModifiersMod;
@@ -7,14 +8,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @SuppressWarnings("ResultOfMethodCallIgnored")
 public class JsonConfigInitialier {
@@ -34,10 +33,32 @@ public class JsonConfigInitialier {
         return fileWriter;
     }
 
+    private static @NotNull FileWriter writeConfig(File configFile) throws IOException {
+        JsonObject config = new JsonObject();
+        config.addProperty("ShouldGenerateViolentJson", true);
+        FileWriter fileWriter = new FileWriter(configFile);
+        fileWriter.write(config.toString());
+        return fileWriter;
+    }
+
+    private static final Supplier<Boolean> shouldGenerateViolentJson = Suppliers.memoize(() -> {
+        File configFile = ROOT.resolve("config.json").toFile();
+        if (!configFile.exists()) return false;
+        try {
+            FileReader reader = new FileReader(configFile);
+            JsonObject configObject = JsonParser.parseReader(reader).getAsJsonObject();
+            return configObject.get("ShouldGenerateViolentJson").getAsBoolean();
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+    });
+
     static {
         ROOT.toFile().mkdirs();
         mkdirs("armor", "curios", "shield", "tool", "bow");
-        generateExampleFile();
+        generateJsonConfig();
+        if (shouldGenerateViolentJson.get()) generateExampleFile();
     }
 
     private static void mkdirs(String @NotNull ... strings) {
@@ -52,6 +73,18 @@ public class JsonConfigInitialier {
                 writer.close();
             } catch (Throwable throwable) {
                 ModifiersMod.LOGGER.error("Error occurs during example json file generation", throwable);
+            }
+        }
+    }
+
+    private static void generateJsonConfig() {
+        File config = new File(ROOT.toFile(), "config.json");
+        if (!config.exists()) {
+            try {
+                FileWriter writer = writeConfig(config);
+                writer.close();
+            } catch (IOException e) {
+                ModifiersMod.LOGGER.error("Error occurs during config json file generation", e);
             }
         }
     }
