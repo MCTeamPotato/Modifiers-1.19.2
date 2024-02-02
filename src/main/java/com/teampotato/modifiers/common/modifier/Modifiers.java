@@ -3,7 +3,6 @@ package com.teampotato.modifiers.common.modifier;
 import com.teampotato.modifiers.ModifiersMod;
 import com.teampotato.modifiers.common.config.toml.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
 import net.minecraft.item.*;
@@ -12,11 +11,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static com.teampotato.modifiers.common.config.json.JsonConfigInitialier.*;
+
 
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class Modifiers {
@@ -91,8 +91,10 @@ public class Modifiers {
     }
 
     @Contract("_, _ -> new")
-    private static @NotNull List<? extends String> merge(@NotNull Iterable<? extends String> iterable1, @NotNull Iterable<? extends String> iterable2) {
-        return new ObjectArrayList<>(new MergedStringIterator(iterable1.iterator(), iterable2.iterator()));
+    private static @NotNull List<? extends String> merge(@NotNull List<? extends String> iterable1, @NotNull List<? extends String> iterable2) {
+        List<String> list = new ArrayList<>(iterable1);
+        list.addAll(iterable2);
+        return list;
     }
 
     private static void initBowModifiers() {
@@ -220,7 +222,7 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute)), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -233,36 +235,12 @@ public class Modifiers {
             initShieldModifiers();
             if (ModifiersMod.isCuriosLoaded() && !CuriosConfig.WHETHER_OR_NOT_CURIOS_USE_ARMOR_MODIFIERS.get()) initCuriosModifiers();
         } catch (Exception e) {
-            ModifiersMod.LOGGER.error("Exception occurs during modifiers initialization", e);
-        }
-    }
-
-    static class MergedStringIterator implements Iterator<String> {
-        private final Iterator<? extends String> iterator1;
-        private final Iterator<? extends String> iterator2;
-        private boolean useIterator1;
-
-        public MergedStringIterator(Iterator<? extends String> iterator1, Iterator<? extends String> iterator2) {
-            this.iterator1 = iterator1;
-            this.iterator2 = iterator2;
-            this.useIterator1 = true;
-        }
-
-        @Override
-        public boolean hasNext() {
-            return (useIterator1 && iterator1.hasNext()) || iterator2.hasNext();
-        }
-
-        @Override
-        public String next() {
-            if (useIterator1) {
-                if (iterator1.hasNext()) {
-                    return iterator1.next();
-                } else {
-                    useIterator1 = false;
-                }
+            if (!crashTheGameIfConfigHasErrors.get()) {
+                ModifiersMod.LOGGER.error("Exception occurs during modifiers initialization", e);
+            } else {
+                ModifiersMod.LOGGER.error("Exception occurs during modifiers initialization", e);
+                Runtime.getRuntime().exit(-1);
             }
-            return iterator2.next();
         }
     }
 }

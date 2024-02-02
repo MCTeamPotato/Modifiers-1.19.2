@@ -10,8 +10,7 @@ import java.util.function.Predicate;
 public class ModifierPool {
     public Predicate<ItemStack> isApplicable;
     public int totalWeight = 0;
-    // Pool weight, for choosing which pool to use when multiple are applicable.
-    public int poolWeight = 0;
+
     public Set<Modifier> modifiers = new ObjectOpenHashSet<>();
 
     public ModifierPool(Predicate<ItemStack> isApplicable) {

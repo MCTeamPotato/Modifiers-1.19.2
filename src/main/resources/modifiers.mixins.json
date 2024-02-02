@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.teampotato.modifiers.mixin",
+  "plugin": "com.teampotato.modifiers.JsonConfigSetup",
   "compatibilityLevel": "JAVA_17",
   "minVersion": "0.8",
   "overwrites": {

@@ -20,7 +20,7 @@ public class ModifierHandler {
     public static final String tagName = "itemModifier";
     public static final String bookTagName = "bookModifier";
 
-    public static boolean canHaveModifiers(ItemStack stack) {
+    public static boolean canHaveModifiers(@NotNull ItemStack stack) {
         return !stack.isEmpty() && stack.getMaxCount() <= 1;
     }
 
@@ -92,9 +92,7 @@ public class ModifierHandler {
     }
 
     public static void applyEquipmentModifier(LivingEntity entity, @NotNull Modifier modifier, EquipmentSlot type) {
-        if (modifier.type == ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) return;
-        if (modifier.type == ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR) return;
-
+        if (modifier.type == ModifierType.HELD) return;
         for (int i = 0; i < modifier.modifiers.size(); i++) {
             Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getEquipmentUuid(type, i);
