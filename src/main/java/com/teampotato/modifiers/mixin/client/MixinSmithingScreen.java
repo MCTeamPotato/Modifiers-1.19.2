@@ -13,7 +13,6 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.SmithingScreenHandler;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Identifier;
@@ -90,9 +89,9 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
                 (button, matrixStack, i, j) -> this.renderTooltip(matrixStack, new TranslatableText("container.modifiers.reforge.reforge"), i, j));
         this.modifiers_reforgeButton.setTextureUV(0, 202, 20, 20, new Identifier("modifiers", "textures/gui/reforger.png"));
 
-        this.addDrawableChild(this.modifiers_tabButton1);
-        this.addDrawableChild(this.modifiers_tabButton2);
-        this.addDrawableChild(this.modifiers_reforgeButton);
+        this.addButton(this.modifiers_tabButton1);
+        this.addButton(this.modifiers_tabButton2);
+        this.addButton(this.modifiers_reforgeButton);
 
         modifiers_tab1Title = this.title;
         modifiers_tab2Title = new TranslatableText("container.modifiers.reforge");
