@@ -16,7 +16,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -111,9 +110,9 @@ public class Modifier {
             return this;
         }
 
-        public ModifierBuilder addModifiers(String[] attribute, AttributeModifierSupplier[] modifier) {
-            for (String entityAttribute : attribute) {
-                int index = Arrays.asList(attribute).indexOf(entityAttribute);
+        public ModifierBuilder addModifiers(String @NotNull [] attribute, AttributeModifierSupplier[] modifier) {
+            for (int index = 0; index < attribute.length; index++) {
+                String entityAttribute = attribute[index];
                 EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
                 if (registryAttribute == null) {
                     throw new RuntimeException("Invalid key: " + entityAttribute);
