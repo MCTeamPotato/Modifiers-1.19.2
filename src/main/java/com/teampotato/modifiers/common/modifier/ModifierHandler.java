@@ -92,7 +92,9 @@ public class ModifierHandler {
     }
 
     public static void applyEquipmentModifier(LivingEntity entity, @NotNull Modifier modifier, EquipmentSlot type) {
-        if (modifier.type == ModifierType.HELD) return;
+        if (modifier.type == ModifierType.HELD && type.getType() == EquipmentSlot.Type.ARMOR || modifier.type == ModifierType.EQUIPPED && type.getType() == EquipmentSlot.Type.HAND) {
+            return;
+        }
         for (int i = 0; i < modifier.modifiers.size(); i++) {
             Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getEquipmentUuid(type, i);
