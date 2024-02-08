@@ -22,7 +22,7 @@ public abstract class MixinItemStack {
         Modifier modifier = ModifierHandler.getModifier((ItemStack) (Object)this);
         if (modifier != null && modifier != Modifiers.NONE) {
             MutableText modifierText = MutableText.of(modifier.getFormattedName());
-            MutableText itemText = Text.translatable(this.getItem().getTranslationKey((ItemStack) (Object)this));
+            Text itemText = this.getItem().getName();
             MutableText newItemName = modifierText.append(" ").append(itemText);
             cir.setReturnValue(newItemName);
         }
