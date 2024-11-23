@@ -1,23 +1,23 @@
 package com.teampotato.modifiers.common.network;
 
 import com.teampotato.modifiers.common.reforge.SmithingScreenHandlerReforge;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("unused")
 public class PacketC2SReforge {
     public PacketC2SReforge() {}
 
-    PacketC2SReforge(PacketByteBuf buf) {}
+    PacketC2SReforge(FriendlyByteBuf buf) {}
 
-    void encode(PacketByteBuf buf) {}
+    void encode(FriendlyByteBuf buf) {}
 
     public static class Handler {
         public static void handle(PacketC2SReforge packet, NetworkHandler.@NotNull PacketContext context) {
-            PlayerEntity player = context.player;
-            if (player != null && player.currentScreenHandler instanceof SmithingScreenHandlerReforge) {
-                ((SmithingScreenHandlerReforge) player.currentScreenHandler).modifiers$tryReforge();
+            Player player = context.player;
+            if (player != null && player.containerMenu instanceof SmithingScreenHandlerReforge) {
+                ((SmithingScreenHandlerReforge) player.containerMenu).modifiers$tryReforge();
             }
         }
     }

@@ -1,11 +1,10 @@
 package com.teampotato.modifiers.common.modifier;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.item.ItemStack;
-
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Predicate;
+import net.minecraft.world.item.ItemStack;
 
 public class ModifierPool {
     public Predicate<ItemStack> isApplicable;

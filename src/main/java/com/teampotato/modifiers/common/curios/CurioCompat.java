@@ -2,8 +2,8 @@ package com.teampotato.modifiers.common.curios;
 
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.event.CurioChangeEvent;

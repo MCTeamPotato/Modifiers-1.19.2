@@ -4,9 +4,9 @@ import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.modifier.Modifiers;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -18,8 +18,8 @@ public class CommonEvents {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onAnvilUpdate(AnvilUpdateEvent event) {
         ItemStack right = event.getRight();
-        if (right.getItem() instanceof ItemModifierBook && ModifierHandler.canHaveModifiers(event.getLeft()) && right.getNbt() != null) {
-            Modifier modifier = Modifiers.MODIFIERS.get(new Identifier(right.getNbt().getString(ModifierHandler.bookTagName)));
+        if (right.getItem() instanceof ItemModifierBook && ModifierHandler.canHaveModifiers(event.getLeft()) && right.getTag() != null) {
+            Modifier modifier = Modifiers.MODIFIERS.get(new ResourceLocation(right.getTag().getString(ModifierHandler.bookTagName)));
             if (modifier != null) {
                 ItemStack output = event.getLeft().copy();
                 ModifierHandler.setModifier(output, modifier);

@@ -3,10 +3,10 @@ package com.teampotato.modifiers.common.modifier;
 import com.teampotato.modifiers.ModifiersMod;
 import com.teampotato.modifiers.common.config.toml.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier.Operation;
-import net.minecraft.item.*;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation;
+import net.minecraft.world.item.*;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -20,9 +20,9 @@ import static com.teampotato.modifiers.common.config.json.JsonConfigInitialier.*
 
 @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
 public class Modifiers {
-    public static final Map<Identifier, Modifier> MODIFIERS = new Object2ObjectOpenHashMap<>();
+    public static final Map<ResourceLocation, Modifier> MODIFIERS = new Object2ObjectOpenHashMap<>();
 
-    public static final Modifier NONE = new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, "none"), "modifier_none", ModifierType.BOTH).setWeight(0).build();
+    public static final Modifier NONE = new Modifier.ModifierBuilder(new ResourceLocation(ModifiersMod.MOD_ID, "none"), "modifier_none", ModifierType.BOTH).setWeight(0).build();
 
     static {
         MODIFIERS.put(NONE.name, NONE);
@@ -35,21 +35,21 @@ public class Modifiers {
     public static final ModifierPool toolPool = new ModifierPool(stack -> {
         Item item = stack.getItem();
         if (item instanceof SwordItem) return true;
-        return item instanceof MiningToolItem;
+        return item instanceof DiggerItem;
     });
 
-    public static final ModifierPool bowPool = new ModifierPool(stack -> stack.getItem() instanceof RangedWeaponItem);
+    public static final ModifierPool bowPool = new ModifierPool(stack -> stack.getItem() instanceof ProjectileWeaponItem);
 
     public static final ModifierPool shieldPool = new ModifierPool(stack -> stack.getItem() instanceof ShieldItem);
 
     @Contract("_ -> new")
     private static Modifier.@NotNull ModifierBuilder equipped(String name) {
-        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.EQUIPPED);
+        return new Modifier.ModifierBuilder(new ResourceLocation(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.EQUIPPED);
     }
 
     @Contract("_ -> new")
     private static Modifier.@NotNull ModifierBuilder held(String name) {
-        return new Modifier.ModifierBuilder(new Identifier(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.HELD);
+        return new Modifier.ModifierBuilder(new ResourceLocation(ModifiersMod.MOD_ID, name), "modifier_" + name, ModifierType.HELD);
     }
 
     private static void addCurio(Modifier modifier) {
@@ -85,7 +85,7 @@ public class Modifiers {
     private static Modifier.AttributeModifierSupplier @NotNull [] mods(String @NotNull [] amounts, String[] ops) {
         Modifier.AttributeModifierSupplier[] suppliers = new Modifier.AttributeModifierSupplier[amounts.length];
         for (int index = 0; index < amounts.length; index++) {
-            suppliers[index] = new Modifier.AttributeModifierSupplier(Double.parseDouble(amounts[index]), Operation.fromId(Integer.parseInt(ops[index])));
+            suppliers[index] = new Modifier.AttributeModifierSupplier(Double.parseDouble(amounts[index]), Operation.fromValue(Integer.parseInt(ops[index])));
         }
         return suppliers;
     }
@@ -115,12 +115,12 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addBow(held(name).addModifiers(attributes, mods(amounts, operations_ids)).setWeight(Integer.parseInt(weight)).build());
             } else {
-                EntityAttribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute));
+                Attribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attribute));
                 if (entityAttribute == null) {
                     ModifiersMod.LOGGER.fatal("Invalid value: " + attribute);
                     return;
                 }
-                addBow(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addBow(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromValue(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -143,12 +143,12 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addShield(held(name).addModifiers(attributes, mods(amounts, operations_ids)).setWeight(Integer.parseInt(weight)).build());
             } else {
-                EntityAttribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute));
+                Attribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attribute));
                 if (entityAttribute == null) {
                     ModifiersMod.LOGGER.fatal("Invalid value: " + attribute);
                     return;
                 }
-                addShield(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addShield(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromValue(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -171,12 +171,12 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addTool(held(name).addModifiers(attributes, mods(amounts, operations_ids)).setWeight(Integer.parseInt(weight)).build());
             } else {
-                EntityAttribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute));
+                Attribute entityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attribute));
                 if (entityAttribute == null) {
                     ModifiersMod.LOGGER.fatal("Invalid value: " + attribute);
                     return;
                 }
-                addTool(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addTool(held(name).setWeight(Integer.parseInt(weight)).addModifier(entityAttribute, mod(Double.parseDouble(amount), Operation.fromValue(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -199,7 +199,7 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addArmor(equipped(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addArmor(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addArmor(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attribute.split(":")[0], attribute.split(":")[1])), mod(Double.parseDouble(amount), Operation.fromValue(Integer.parseInt(operations_id)))).build());
             }
         }
     }
@@ -222,7 +222,7 @@ public class Modifiers {
                 String[] operations_ids = operations_id.split(";");
                 addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifiers(attributes, mods(amounts, operations_ids)).build());
             } else {
-                addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new Identifier(attribute)), mod(Double.parseDouble(amount), Operation.fromId(Integer.parseInt(operations_id)))).build());
+                addCurio(equipped(name).setWeight(Integer.parseInt(weight)).addModifier(ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(attribute)), mod(Double.parseDouble(amount), Operation.fromValue(Integer.parseInt(operations_id)))).build());
             }
         }
     }

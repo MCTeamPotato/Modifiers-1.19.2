@@ -1,14 +1,13 @@
 package com.teampotato.modifiers.common.modifier;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeModifier;
-import net.minecraft.entity.attribute.EntityAttributes;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableTextContent;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -19,17 +18,17 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-import static net.minecraft.item.ItemStack.MODIFIER_FORMAT;
+import static net.minecraft.world.item.ItemStack.ATTRIBUTE_MODIFIER_FORMAT;
 
 public class Modifier {
-    public final Identifier name;
+    public final ResourceLocation name;
     public final String debugName;
     public final int weight;
     public final ModifierType type;
-    public final List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers;
+    public final List<Pair<Attribute, AttributeModifierSupplier>> modifiers;
 
 
-    private Modifier(Identifier name, String debugName, int weight, ModifierType type, List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers) {
+    private Modifier(ResourceLocation name, String debugName, int weight, ModifierType type, List<Pair<Attribute, AttributeModifierSupplier>> modifiers) {
         this.name = name;
         this.debugName = debugName;
         this.weight = weight;
@@ -37,18 +36,18 @@ public class Modifier {
         this.modifiers = modifiers;
     }
 
-    public TranslatableTextContent getFormattedName() {
-        return new TranslatableTextContent("modifier." + name.getNamespace() + "." + name.getPath());
+    public MutableComponent getTranslate() {
+        return Component.translatable("modifier." + name.getNamespace() + "." + name.getPath());
     }
 
     @Nullable
-    private static MutableText getModifierDescription(Pair<EntityAttribute, AttributeModifierSupplier> entry) {
+    private static MutableComponent getModifierDescription(Pair<Attribute, AttributeModifierSupplier> entry) {
         AttributeModifierSupplier modifier = entry.getValue();
         double d0 = modifier.amount;
 
         double d1;
-        if (modifier.operation == EntityAttributeModifier.Operation.ADDITION) {
-            if (entry.getKey().equals(EntityAttributes.GENERIC_KNOCKBACK_RESISTANCE)) {
+        if (modifier.operation == AttributeModifier.Operation.ADDITION) {
+            if (entry.getKey().equals(Attributes.KNOCKBACK_RESISTANCE)) {
                 d1 = d0 * 10.0D;
             } else {
                 d1 = d0;
@@ -58,28 +57,28 @@ public class Modifier {
         }
 
         if (d0 > 0.0D) {
-            return Text.translatable("attribute.modifier.plus." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
-                    Text.translatable(entry.getKey().getTranslationKey())).formatted(Formatting.BLUE);
+            return Component.translatable("attribute.modifier.plus." + modifier.operation.toValue(), ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                    Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.BLUE);
         } else if (d0 < 0.0D) {
             d1 = d1 * -1.0D;
-            return Text.translatable("attribute.modifier.take." + modifier.operation.getId(), MODIFIER_FORMAT.format(d1),
-                    Text.translatable(entry.getKey().getTranslationKey())).formatted(Formatting.RED);
+            return Component.translatable("attribute.modifier.take." + modifier.operation.toValue(), ATTRIBUTE_MODIFIER_FORMAT.format(d1),
+                    Component.translatable(entry.getKey().getDescriptionId())).withStyle(ChatFormatting.RED);
         }
         return null;
     }
 
-    public List<MutableText> getInfoLines() {
-        List<MutableText> lines = new ObjectArrayList<>();
+    public List<MutableComponent> getInfoLines() {
+        List<MutableComponent> lines = new ObjectArrayList<>();
         int size = modifiers.size();
         if (size < 1) return lines;
         if (size == 1) {
-            MutableText description = getModifierDescription(modifiers.get(0));
+            MutableComponent description = getModifierDescription(modifiers.get(0));
             if (description == null) return lines;
-            lines.add(MutableText.of(getFormattedName()).append(": ").formatted(Formatting.GRAY).append(description));
+            lines.add(getTranslate().append(": ").withStyle(ChatFormatting.GRAY).append(description));
         } else {
-            lines.add(MutableText.of(getFormattedName()).append(":").formatted(Formatting.GRAY));
-            for (Pair<EntityAttribute, AttributeModifierSupplier> entry : modifiers) {
-                MutableText description = getModifierDescription(entry);
+            lines.add(getTranslate().append(":").withStyle(ChatFormatting.GRAY));
+            for (Pair<Attribute, AttributeModifierSupplier> entry : modifiers) {
+                MutableComponent description = getModifierDescription(entry);
                 if (description != null) lines.add(description);
             }
             if (lines.size() == 1) lines.clear();
@@ -89,12 +88,12 @@ public class Modifier {
 
     public static class ModifierBuilder {
         int weight = 100;
-        final Identifier name;
+        final ResourceLocation name;
         final String debugName;
         final ModifierType type;
-        List<Pair<EntityAttribute, AttributeModifierSupplier>> modifiers = new ObjectArrayList<>();
+        List<Pair<Attribute, AttributeModifierSupplier>> modifiers = new ObjectArrayList<>();
 
-        public ModifierBuilder(Identifier name, String debugName, ModifierType type) {
+        public ModifierBuilder(ResourceLocation name, String debugName, ModifierType type) {
             this.name = name;
             this.debugName = debugName;
             this.type = type;
@@ -105,7 +104,7 @@ public class Modifier {
             return this;
         }
 
-        public ModifierBuilder addModifier(EntityAttribute attribute, AttributeModifierSupplier modifier) {
+        public ModifierBuilder addModifier(Attribute attribute, AttributeModifierSupplier modifier) {
             modifiers.add(new ImmutablePair<>(attribute, modifier));
             return this;
         }
@@ -113,7 +112,7 @@ public class Modifier {
         public ModifierBuilder addModifiers(String @NotNull [] attribute, AttributeModifierSupplier[] modifier) {
             for (int index = 0; index < attribute.length; index++) {
                 String entityAttribute = attribute[index];
-                EntityAttribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new Identifier(entityAttribute));
+                Attribute registryAttribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation(entityAttribute));
                 if (registryAttribute == null) {
                     throw new RuntimeException("Invalid key: " + entityAttribute);
                 }
@@ -127,11 +126,11 @@ public class Modifier {
         }
     }
 
-    public record AttributeModifierSupplier(double amount, EntityAttributeModifier.Operation operation) {
+    public record AttributeModifierSupplier(double amount, AttributeModifier.Operation operation) {
 
         @Contract(value = "_, _ -> new", pure = true)
-        public @NotNull EntityAttributeModifier getAttributeModifier(UUID id, String name) {
-            return new EntityAttributeModifier(id, name, amount, operation);
+        public @NotNull AttributeModifier getAttributeModifier(UUID id, String name) {
+            return new AttributeModifier(id, name, amount, operation);
         }
     }
 }

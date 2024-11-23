@@ -5,7 +5,7 @@ license="MIT"
 [[mods]]
 modId="modifiers"
 version="${version}"
-displayName="Remodifier"
+displayName="ReRemodifier"
 authors="Team Potato"
 description='''
 

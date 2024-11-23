@@ -1,21 +1,22 @@
 package com.teampotato.modifiers.mixin.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.teampotato.modifiers.client.SmithingScreenReforge;
 import com.teampotato.modifiers.client.TabButtonWidget;
 import com.teampotato.modifiers.common.modifier.Modifier;
 import com.teampotato.modifiers.common.modifier.ModifierHandler;
 import com.teampotato.modifiers.common.network.NetworkHandler;
 import com.teampotato.modifiers.common.network.PacketC2SReforge;
-import net.minecraft.client.gui.screen.ingame.ForgingScreen;
-import net.minecraft.client.gui.screen.ingame.SmithingScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.SmithingScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
+import net.minecraft.client.gui.screens.inventory.SmithingScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.SmithingMenu;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -23,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(SmithingScreen.class)
-public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHandler> implements SmithingScreenReforge {
+public abstract class MixinSmithingScreen extends ItemCombinerScreen<SmithingMenu> implements SmithingScreenReforge {
     @Unique
     private TabButtonWidget modifiers_reforgeButton;
     @Unique
@@ -36,16 +37,16 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
     private boolean modifiers_canReforge = false;
 
     @Unique
-    private Text modifiers_tab1Title;
+    private Component modifiers_tab1Title;
     @Unique
-    private Text modifiers_tab2Title;
+    private Component modifiers_tab2Title;
 
     @Unique
     private int modifiers_outputSlotX;
     @Unique
     private int modifiers_outputSlotY;
 
-    public MixinSmithingScreen(SmithingScreenHandler handler, PlayerInventory playerInventory, Text title, Identifier texture) {
+    public MixinSmithingScreen(SmithingMenu handler, Inventory playerInventory, Component title, ResourceLocation texture) {
         super(handler, playerInventory, title, texture);
     }
 
@@ -54,7 +55,7 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         modifiers_onTab2 = false;
         modifiers_reforgeButton.visible = false;
         this.title = modifiers_tab1Title;
-        Slot slot = this.getScreenHandler().slots.get(2);
+        Slot slot = this.getMenu().slots.get(2);
         slot.x = modifiers_outputSlotX;
         slot.y = modifiers_outputSlotY;
         this.modifiers_tabButton1.toggled = true;
@@ -66,7 +67,7 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         modifiers_onTab2 = true;
         modifiers_reforgeButton.visible = true;
         this.title = modifiers_tab2Title;
-        Slot slot = this.getScreenHandler().slots.get(2);
+        Slot slot = this.getMenu().slots.get(2);
         slot.x = 152;
         slot.y = 8;
         this.modifiers_tabButton1.toggled = false;
@@ -75,26 +76,28 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
 
     @Override
     public void modifiers_init() {
-        int k = (this.width - this.backgroundWidth) / 2;
-        int l = (this.height - this.backgroundHeight) / 2;
-        Slot slot = this.getScreenHandler().slots.get(2);
+        int k = (this.width - this.imageWidth) / 2;
+        int l = (this.height - this.imageHeight) / 2;
+        Slot slot = this.getMenu().slots.get(2);
         modifiers_outputSlotX = slot.x;
         modifiers_outputSlotY = slot.y;
-        this.modifiers_tabButton1 = new TabButtonWidget(k-70, l+2, 70, 18, Text.translatable("container.modifiers.reforge.tab1"), (button) -> modifiers_toTab1());
-        this.modifiers_tabButton2 = new TabButtonWidget(k-70, l+22, 70, 18, Text.translatable("container.modifiers.reforge.tab2"), (button) -> modifiers_toTab2());
-        this.modifiers_tabButton1.setTextureUV(0, 166, 70, 18, new Identifier("modifiers", "textures/gui/reforger.png"));
-        this.modifiers_tabButton2.setTextureUV(0, 166, 70, 18, new Identifier("modifiers", "textures/gui/reforger.png"));
-        this.modifiers_reforgeButton = new TabButtonWidget(k+132, l+45, 20, 20, Text.of(""),
+        this.modifiers_tabButton1 = new TabButtonWidget(k-70, l+2, 70, 18, Component.translatable("container.modifiers.reforge.tab1"), (button) -> modifiers_toTab1());
+        this.modifiers_tabButton2 = new TabButtonWidget(k-70, l+22, 70, 18, Component.translatable("container.modifiers.reforge.tab2"), (button) -> modifiers_toTab2());
+        this.modifiers_tabButton1.setTextureUV(0, 166, 70, 18, new ResourceLocation("modifiers", "textures/gui/reforger.png"));
+        this.modifiers_tabButton2.setTextureUV(0, 166, 70, 18, new ResourceLocation("modifiers", "textures/gui/reforger.png"));
+        MutableComponent reforge = Component.translatable("container.modifiers.reforge.reforge");
+        this.modifiers_reforgeButton = new TabButtonWidget(k+132, l+45, 20, 20, Component.nullToEmpty(""),
                 (button) -> NetworkHandler.sendToServer(new PacketC2SReforge()),
-                (button, matrixStack, i, j) -> this.renderTooltip(matrixStack, Text.translatable("container.modifiers.reforge.reforge"), i, j));
-        this.modifiers_reforgeButton.setTextureUV(0, 202, 20, 20, new Identifier("modifiers", "textures/gui/reforger.png"));
+                (supplier) -> reforge);
+        modifiers_reforgeButton.setTooltip(Tooltip.create(reforge));
+        this.modifiers_reforgeButton.setTextureUV(0, 202, 20, 20, new ResourceLocation("modifiers", "textures/gui/reforger.png"));
 
-        this.addDrawableChild(this.modifiers_tabButton1);
-        this.addDrawableChild(this.modifiers_tabButton2);
-        this.addDrawableChild(this.modifiers_reforgeButton);
+        this.addRenderableWidget(this.modifiers_tabButton1);
+        this.addRenderableWidget(this.modifiers_tabButton2);
+        this.addRenderableWidget(this.modifiers_reforgeButton);
 
         modifiers_tab1Title = this.title;
-        modifiers_tab2Title = Text.translatable("container.modifiers.reforge");
+        modifiers_tab2Title = Component.translatable("container.modifiers.reforge");
         this.modifiers_toTab1();
     }
 
@@ -110,13 +113,13 @@ public abstract class MixinSmithingScreen extends ForgingScreen<SmithingScreenHa
         this.modifiers_reforgeButton.active = canReforge;
     }
 
-    @Inject(method = "drawForeground", at = @At("RETURN"))
-    private void onDrawForeground(MatrixStack matrixStack, int i, int j, CallbackInfo ci) {
+    @Inject(method = "render", at = @At("RETURN"))
+    private void onDrawForeground(PoseStack matrixStack, int i, int j, float partialTick, CallbackInfo ci) {
         if (this.modifiers_onTab2) {
-            ItemStack stack = this.handler.getSlot(0).getStack();
+            ItemStack stack = this.menu.getSlot(0).getItem();
             Modifier modifier = ModifierHandler.getModifier(stack);
             if (modifier != null) {
-                this.textRenderer.draw(matrixStack, Text.translatable("misc.modifiers.modifier_prefix").append(MutableText.of(modifier.getFormattedName())), (float)this.titleX-15, (float)this.titleY+15, 4210752);
+                this.font.draw(matrixStack, Component.translatable("misc.modifiers.modifier_prefix").append(modifier.getTranslate()), (float)this.titleLabelX-15, (float)this.titleLabelY+15, 4210752);
             }
         }
     }

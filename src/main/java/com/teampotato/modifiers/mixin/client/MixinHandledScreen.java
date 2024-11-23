@@ -1,20 +1,21 @@
 package com.teampotato.modifiers.mixin.client;
 
 import com.teampotato.modifiers.client.SmithingScreenReforge;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.gui.screen.ingame.SmithingScreen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.SmithingScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.MenuType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(HandledScreen.class)
+@Mixin(AbstractContainerScreen.class)
 public abstract class MixinHandledScreen extends Screen {
 
-    protected MixinHandledScreen(Text title) {
+    protected MixinHandledScreen(Component title) {
         super(title);
     }
 
@@ -27,7 +28,7 @@ public abstract class MixinHandledScreen extends Screen {
 
     @Unique
     @SuppressWarnings("rawtypes")
-    private HandledScreen modifiers$getThis() {
-        return (HandledScreen) (Object) this;
+    private AbstractContainerScreen modifiers$getThis() {
+        return (AbstractContainerScreen) (Object) this;
     }
 }

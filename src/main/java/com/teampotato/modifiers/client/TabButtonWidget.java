@@ -1,31 +1,31 @@
 package com.teampotato.modifiers.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
-public class TabButtonWidget extends ButtonWidget {
+public class TabButtonWidget extends Button {
     public boolean toggled;
 
-    protected Identifier texture;
+    protected ResourceLocation texture;
     protected int u;
     protected int v;
     protected int pressedUOffset;
     protected int hoverVOffset;
 
-    public TabButtonWidget(int i, int j, int k, int l, Text text, PressAction pressAction) {
-        super(i, j, k, l, text, pressAction);
+    public TabButtonWidget(int i, int j, int k, int l, Component text, OnPress pressAction) {
+        super(i, j, k, l, text, pressAction, DEFAULT_NARRATION);
     }
 
-    public TabButtonWidget(int i, int j, int k, int l, Text text, PressAction pressAction, ButtonWidget.TooltipSupplier tooltipSupplier) {
-        super(i, j, k, l, text, pressAction, tooltipSupplier);
+    public TabButtonWidget(int i, int j, int k, int l, Component text, OnPress pressAction, CreateNarration createNarration) {
+        super(i, j, k, l, text, pressAction, createNarration);
     }
 
-    public void setTextureUV(int i, int j, int k, int l, Identifier identifier) {
+    public void setTextureUV(int i, int j, int k, int l, ResourceLocation identifier) {
         this.u = i;
         this.v = j;
         this.pressedUOffset = k;
@@ -34,10 +34,10 @@ public class TabButtonWidget extends ButtonWidget {
     }
 
     @Override
-    public void renderButton(MatrixStack matrixStack, int i, int j, float f) {
+    public void renderWidget(PoseStack matrixStack, int i, int j, float f) {
 
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        minecraftClient.getTextureManager().bindTexture(this.texture);
+        Minecraft minecraftClient = Minecraft.getInstance();
+        minecraftClient.getTextureManager().bindForSetup(this.texture);
         RenderSystem.disableDepthTest();
 
         int u = this.u;
@@ -46,16 +46,16 @@ public class TabButtonWidget extends ButtonWidget {
             u += this.pressedUOffset;
         }
 
-        if (this.isHovered()) {
+        if (this.isHoveredOrFocused()) {
             v += this.hoverVOffset;
         }
 
-        this.drawTexture(matrixStack, this.x, this.y, u, v, this.width, this.height);
+        blit(matrixStack, this.getX(), this.getY(), u, v, this.width, this.height);
         int color = this.active ? 16777215 : 10526880;
-        drawCenteredText(matrixStack, minecraftClient.textRenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 8) / 2, color | MathHelper.ceil(this.alpha * 255.0F) << 24);
+        drawCenteredString(matrixStack, minecraftClient.font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 8) / 2, color | Mth.ceil(this.alpha * 255.0F) << 24);
 
-        if (this.isHovered()) this.renderTooltip(matrixStack, i, j);
+        //if (this.isHoveredOrFocused()) this.renderToolTip(matrixStack, i, j);
         RenderSystem.enableDepthTest();
-        super.renderButton(matrixStack, i, j, f);
+        super.renderWidget(matrixStack, i, j, f);
     }
 }

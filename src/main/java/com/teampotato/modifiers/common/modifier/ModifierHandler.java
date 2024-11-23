@@ -1,18 +1,18 @@
 package com.teampotato.modifiers.common.modifier;
 
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.attribute.EntityAttribute;
-import net.minecraft.entity.attribute.EntityAttributeInstance;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Identifier;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.UUID;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.item.ItemStack;
 
 public class ModifierHandler {
     public static final long COMMON_SEGMENT_CURIO = (0x7a6ca76cL) << 32;
@@ -21,7 +21,7 @@ public class ModifierHandler {
     public static final String bookTagName = "bookModifier";
 
     public static boolean canHaveModifiers(@NotNull ItemStack stack) {
-        return !stack.isEmpty() && stack.getMaxCount() <= 1;
+        return !stack.isEmpty() && stack.getMaxStackSize() <= 1;
     }
 
     @Nullable
@@ -36,22 +36,22 @@ public class ModifierHandler {
     }
 
     public static void setModifier(ItemStack stack, Modifier modifier) {
-        NbtCompound tag = stack.getOrCreateNbt();
+        CompoundTag tag = stack.getOrCreateTag();
         tag.remove(tagName);
         tag.putString(tagName, modifier.name.toString());
     }
 
     public static boolean hasModifier(ItemStack stack) {
-        NbtCompound tag = stack.getNbt();
+        CompoundTag tag = stack.getTag();
         return tag != null && tag.contains(tagName);
     }
 
     @Nullable
     public static Modifier getModifier(ItemStack stack) {
-        NbtCompound tag = stack.getNbt();
+        CompoundTag tag = stack.getTag();
         if (tag == null) return null;
         if (!tag.contains(tagName)) return null;
-        return Modifiers.MODIFIERS.get(new Identifier(tag.getString(tagName)));
+        return Modifiers.MODIFIERS.get(new ResourceLocation(tag.getString(tagName)));
     }
 
     public static UUID getCurioUuid(String identifier, int slot, int attributeIndex) {
@@ -66,20 +66,20 @@ public class ModifierHandler {
             return;
         }
         for (int i = 0; i < modifier.modifiers.size(); i++) {
-            Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
+            Pair<Attribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getCurioUuid(slotIdentifier, index, i);
-            EntityAttributeInstance instance = entity.getAttributeInstance(entry.getKey());
+            AttributeInstance instance = entity.getAttribute(entry.getKey());
             if (instance != null && instance.getModifier(id) == null) {
-                instance.addTemporaryModifier(entry.getValue().getAttributeModifier(id, "curio_modifier_"+modifier.debugName));
+                instance.addTransientModifier(entry.getValue().getAttributeModifier(id, "curio_modifier_"+modifier.debugName));
             }
         }
     }
 
     public static void removeCurioModifier(LivingEntity entity, Modifier modifier, String slotIdentifier, int index) {
         for (int i = 0; i < modifier.modifiers.size(); i++) {
-            Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
+            Pair<Attribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getCurioUuid(slotIdentifier, index, i);
-            EntityAttributeInstance instance = entity.getAttributeInstance(entry.getKey());
+            AttributeInstance instance = entity.getAttribute(entry.getKey());
             if (instance != null) {
                 instance.removeModifier(id);
             }
@@ -96,20 +96,20 @@ public class ModifierHandler {
             return;
         }
         for (int i = 0; i < modifier.modifiers.size(); i++) {
-            Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
+            Pair<Attribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getEquipmentUuid(type, i);
-            EntityAttributeInstance instance = entity.getAttributeInstance(entry.getKey());
+            AttributeInstance instance = entity.getAttribute(entry.getKey());
             if (instance != null && instance.getModifier(id) == null) {
-                instance.addTemporaryModifier(entry.getValue().getAttributeModifier(id, "equipment_modifier_" + modifier.debugName));
+                instance.addTransientModifier(entry.getValue().getAttributeModifier(id, "equipment_modifier_" + modifier.debugName));
             }
         }
     }
 
     public static void removeEquipmentModifier(LivingEntity entity, Modifier modifier, EquipmentSlot type) {
         for (int i = 0; i < modifier.modifiers.size(); i++) {
-            Pair<EntityAttribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
+            Pair<Attribute, Modifier.AttributeModifierSupplier> entry = modifier.modifiers.get(i);
             UUID id = getEquipmentUuid(type, i);
-            EntityAttributeInstance instance = entity.getAttributeInstance(entry.getKey());
+            AttributeInstance instance = entity.getAttribute(entry.getKey());
             if (instance != null) {
                 instance.removeModifier(id);
             }

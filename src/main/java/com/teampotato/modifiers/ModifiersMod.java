@@ -8,9 +8,9 @@ import com.teampotato.modifiers.common.item.ItemModifierBook;
 import com.teampotato.modifiers.common.modifier.Modifiers;
 import com.teampotato.modifiers.common.network.NetworkHandler;
 import com.teampotato.modifiers.common.network.NetworkHandlerForge;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
@@ -33,7 +33,7 @@ public class ModifiersMod {
     public static final RegistryObject<Item> MODIFIER_BOOK;
     public static final Logger LOGGER = LogManager.getLogger();
     public static ICurioProxy CURIO_PROXY;
-    public static ItemGroup GROUP_BOOKS;
+    public static CreativeModeTab GROUP_BOOKS;
 
     public ModifiersMod() {
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -56,14 +56,14 @@ public class ModifiersMod {
     static {
         NetworkHandler.setProxy(new NetworkHandlerForge());
 
-        GROUP_BOOKS = new ItemGroup(-1, MOD_ID +"_books") {
-            static ItemStack icon;
-            @Override
-            public ItemStack createIcon() {
-                if (icon == null) icon = MODIFIER_BOOK.get().getDefaultStack();
-                return icon;
-            }
-        };
+//        GROUP_BOOKS = new CreativeModeTab(-1, MOD_ID +"_books") {
+//            static ItemStack icon;
+//            @Override
+//            public ItemStack getIconItem() {
+//                if (icon == null) icon = MODIFIER_BOOK.get().getDefaultInstance();
+//                return icon;
+//            }
+//        };
     }
 
     private static Boolean isCuriosLoaded = null;
